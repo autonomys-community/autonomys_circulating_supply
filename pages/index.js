@@ -347,7 +347,7 @@ export default function TokenInfo() {
         </div>
         <p style={{ fontSize: '0.9rem', marginTop: '15px' }}>
           <strong>Note:</strong> API uses POST requests with real-time calculations. 
-          Send POST to /api/circulating-supply for current data.
+          Send POST to https://ai3-supply.xyz/api/ for the current data.
         </p>
       </footer>
     </div>
