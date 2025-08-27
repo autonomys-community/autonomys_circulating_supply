@@ -100,9 +100,6 @@ export default function TokenInfo() {
           <p style={{ margin: '0 0 10px 0', color: '#1f2937' }}>
             • <strong>Key Difference:</strong> Most tokens are locked on the EVM layer with smart contracts, even though they appear "unlocked" on the consensus layer
           </p>
-          <p style={{ margin: '0', color: '#1f2937' }}>
-            • <strong>Before TGE:</strong> ALL tokens are locked at protocol level (transfers disabled)
-          </p>
         </div>
       </section>
 
