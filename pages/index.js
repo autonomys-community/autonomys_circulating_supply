@@ -708,8 +708,7 @@ export default function TokenInfo() {
               }}>
                 <div style={{ marginLeft: '20px' }}>
                   <p>• <strong>Operations:</strong> {formatNumber(6_800_000)} tokens (0.68%) - <span style={{color: '#10b981'}}>Liquid</span></p>
-                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(50_000_000)} tokens (5.00%) - <span style={{color: '#f59e0b'}}>TBD</span></p>
-                  <p>• <strong>Long-Term Treasury:</strong> {formatNumber(100_000_000)} tokens (10.00%) - 4-year lockup</p>
+                  <p>• <strong>Treasury:</strong> {formatNumber(150_000_000)} tokens (15.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
                 </div>
               </div>
             )}
@@ -751,7 +750,7 @@ export default function TokenInfo() {
                 <div style={{ marginLeft: '20px' }}>
                   <p>• <strong>Testnet Rewards:</strong> {formatNumber(59_700_000)} tokens (5.97%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
                   <p>• <strong>Stake Wars 1:</strong> {formatNumber(6_000_000)} tokens (0.60%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
-                  <p>• <strong>Stake Wars 2:</strong> {formatNumber(3_000_000)} tokens (0.30%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
+                  <p>• <strong>Stake Wars 2:</strong> {formatNumber(3_000_000)} tokens (0.30%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
                 </div>
               </div>
             )}
