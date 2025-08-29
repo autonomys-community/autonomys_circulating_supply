@@ -403,7 +403,10 @@ export default function TokenInfo() {
               • Autonomys Labs: 70,000,000 (DevCo Treasury locked)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Subspace Foundation: 156,782,580 (Operations + Treasury locked)
+              • Subspace Foundation Treasury: 150,000,000 (locked)
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Subspace Foundation Operations: 6,782,580 (unlocked)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Vendors & Ambassadors: 24,345,400 (locked)
@@ -432,7 +435,7 @@ export default function TokenInfo() {
               <strong>Final Equation:</strong>
             </div>
             <div style={{ fontFamily: 'monospace', fontSize: '1rem' }}>
-              Circulating Supply = 650,000,000 - 561,295,701 (locked) - {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)
+              Circulating Supply = 650,000,000 - 554,513,121 (locked) - {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)
             </div>
             <div style={{ fontFamily: 'monospace', fontSize: '1rem', marginTop: '5px' }}>
               = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total)
