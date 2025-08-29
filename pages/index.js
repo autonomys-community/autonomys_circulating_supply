@@ -109,7 +109,7 @@ export default function TokenInfo() {
               e.target.style.borderColor = '#d1d5db';
             }}
           >
-            🔗 <span>This Code Repository</span>
+            🔗 <span>This Code Repository (GitHub)</span>
           </a>
           <a 
             href="https://github.com/BlockScience/subspace" 
@@ -136,10 +136,134 @@ export default function TokenInfo() {
               e.target.style.borderColor = '#d1d5db';
             }}
           >
-            📚 <span>BlockScience Research</span>
+            📚 <span>BlockScience Research (Dynamic Rewards Issuance Model)</span>
           </a>
         </div>
       </header>
+
+      {/* API Quick Info - Top of Page */}
+      <section style={{ 
+        background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', 
+        color: 'white',
+        padding: '30px',
+        borderRadius: '16px',
+        marginBottom: '40px',
+        textAlign: 'center'
+      }}>
+        <h2 style={{ 
+          fontSize: '1.8rem', 
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px'
+        }}>
+          🔌 <span>API Endpoints Available</span>
+        </h2>
+        <p style={{ fontSize: '1.1rem', marginBottom: '25px', opacity: 0.9 }}>
+          Three simple endpoints for developers and integrations
+        </p>
+        
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '20px',
+          maxWidth: '900px',
+          margin: '0 auto'
+        }}>
+          {/* POST /api */}
+          <div style={{ 
+            background: 'rgba(255,255,255,0.15)', 
+            padding: '20px', 
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '10px' }}>📊</div>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
+              <strong>POST /api</strong>
+            </h3>
+            <p style={{ margin: '0 0 15px 0', fontSize: '0.95rem', opacity: 0.9 }}>
+              Full data + historical queries
+            </p>
+            <div style={{ 
+              background: 'rgba(0,0,0,0.2)', 
+              padding: '10px', 
+              borderRadius: '6px',
+              fontFamily: 'monospace',
+              fontSize: '0.85rem'
+            }}>
+              curl -X POST https://ai3-supply.xyz/api
+            </div>
+          </div>
+
+          {/* GET /total-supply */}
+          <div style={{ 
+            background: 'rgba(255,255,255,0.15)', 
+            padding: '20px', 
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🔢</div>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
+              <strong>GET /total-supply</strong>
+            </h3>
+            <p style={{ margin: '0 0 15px 0', fontSize: '0.95rem', opacity: 0.9 }}>
+              Total supply only (1B tokens)
+            </p>
+            <div style={{ 
+              background: 'rgba(0,0,0,0.2)', 
+              padding: '10px', 
+              borderRadius: '6px',
+              fontFamily: 'monospace',
+              fontSize: '0.85rem'
+            }}>
+              curl https://ai3-supply.xyz/total-supply
+            </div>
+          </div>
+
+          {/* GET /circulating-supply */}
+          <div style={{ 
+            background: 'rgba(255,255,255,0.15)', 
+            padding: '20px', 
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '10px' }}>💰</div>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
+              <strong>GET /circulating-supply</strong>
+            </h3>
+            <p style={{ margin: '0 0 15px 0', fontSize: '0.95rem', opacity: 0.9 }}>
+              Current circulating supply
+            </p>
+            <div style={{ 
+              background: 'rgba(0,0,0,0.2)', 
+              padding: '10px', 
+              borderRadius: '6px',
+              fontFamily: 'monospace',
+              fontSize: '0.85rem'
+            }}>
+              curl https://ai3-supply.xyz/circulating-supply
+            </div>
+          </div>
+        </div>
+
+        <div style={{ 
+          marginTop: '25px',
+          padding: '15px 25px',
+          background: 'rgba(255,255,255,0.1)',
+          borderRadius: '8px',
+          border: '1px solid rgba(255,255,255,0.2)',
+          maxWidth: '600px',
+          margin: '25px auto 0'
+        }}>
+          <p style={{ margin: 0, fontSize: '0.95rem', opacity: 0.9 }}>
+            <strong>💡 Quick Start:</strong> Use GET endpoints for simple integrations, POST for comprehensive data analysis
+          </p>
+        </div>
+      </section>
 
       {/* RPC vs Circulating Supply Explanation */}
       <section style={{ 
@@ -754,7 +878,7 @@ export default function TokenInfo() {
               fontSize: '1.1rem'
             }}
           >
-            🔗 This Code Repository →
+            🔗 This Code Repository (GitHub) →
           </a>
           <a 
             href="https://github.com/BlockScience/subspace" 
@@ -767,7 +891,7 @@ export default function TokenInfo() {
               fontSize: '1.1rem'
             }}
           >
-            📚 BlockScience Research →
+            📚 BlockScience Research (Dynamic Rewards Issuance Model) →
           </a>
         </div>
         <p style={{ fontSize: '0.9rem', marginTop: '15px' }}>
