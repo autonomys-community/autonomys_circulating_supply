@@ -83,6 +83,62 @@ export default function TokenInfo() {
             📊 Official Tokenomics published by the Subspace Foundation (Source of Truth) →
           </a>
         </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexWrap: 'wrap', marginTop: '20px' }}>
+          <a 
+            href="https://github.com/autonomys-community/autonomys_circulating_supply" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#6b7280', 
+              textDecoration: 'none',
+              fontSize: '1rem',
+              border: '1px solid #d1d5db',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#f3f4f6';
+              e.target.style.borderColor = '#9ca3af';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.borderColor = '#d1d5db';
+            }}
+          >
+            🔗 <span>This Code Repository</span>
+          </a>
+          <a 
+            href="https://github.com/BlockScience/subspace" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#6b7280', 
+              textDecoration: 'none',
+              fontSize: '1rem',
+              border: '1px solid #d1d5db',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#f3f4f6';
+              e.target.style.borderColor = '#9ca3af';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.borderColor = '#d1d5db';
+            }}
+          >
+            📚 <span>BlockScience Research</span>
+          </a>
+        </div>
       </header>
 
       {/* RPC vs Circulating Supply Explanation */}
@@ -210,6 +266,94 @@ export default function TokenInfo() {
             fontStyle: 'italic'
           }}>
             <strong>Note:</strong> Only testnet rewards, stake wars rewards, and market liquidity tokens are currently unlocked and transferable.
+          </p>
+        </div>
+      </section>
+
+      {/* BlockScience Dynamic Issuance Model */}
+      <section style={{ 
+        background: '#fefce8', 
+        border: '2px solid #eab308',
+        borderRadius: '12px',
+        padding: '25px',
+        marginBottom: '40px'
+      }}>
+        <h2 style={{ 
+          fontSize: '1.3rem', 
+          marginBottom: '15px', 
+          color: '#92400e',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          📚 BlockScience Dynamic Issuance Model
+        </h2>
+        <p style={{ color: '#92400e', marginBottom: '15px' }}>
+          <strong>Exact mathematical equation for farming rewards calculation:</strong>
+        </p>
+        <div style={{ background: 'rgba(255,255,255,0.8)', padding: '20px', borderRadius: '8px' }}>
+          <div style={{ 
+            fontFamily: 'monospace', 
+            fontSize: '1rem', 
+            lineHeight: '1.6',
+            color: '#1f2937',
+            marginBottom: '15px'
+          }}>
+            <div style={{ marginBottom: '15px' }}>
+              <strong>Source:</strong> <a href="https://academy.autonomys.xyz/autonomys-network/rewards-and-fees" target="_blank" rel="noopener noreferrer" style={{color: '#92400e', textDecoration: 'underline'}}>Autonomys Network Academy</a>
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <strong>Research Repository:</strong> <a href="https://github.com/BlockScience/subspace" target="_blank" rel="noopener noreferrer" style={{color: '#92400e', textDecoration: 'underline'}}>BlockScience Subspace Economic Model</a>
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <strong>Key Parameters:</strong>
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Initial Subsidy: 5.0 AI3 per block
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Max Issuance: 350,000,000 tokens (35% of total supply)
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Block Time: {BLOCK_TIME_SECONDS} seconds
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Decay Start: Block 0 (immediate decay from activation)
+            </div>
+          </div>
+          
+          <div style={{ 
+            background: '#fef3c7', 
+            padding: '20px', 
+            borderRadius: '8px',
+            border: '1px solid #f59e0b',
+            fontFamily: 'monospace',
+            fontSize: '1.1rem'
+          }}>
+            <div style={{ marginBottom: '15px', fontWeight: 'bold' }}>
+              🧮 BlockScience Dynamic Issuance Equation:
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>reference_subsidy = initial_subsidy × e^(-initial_subsidy × (n - decay_block_start) / max_issuance_tokens)</strong>
+            </div>
+            <div style={{ fontSize: '0.9rem', color: '#92400e', marginBottom: '15px' }}>
+              Where: n = current block number, e = Euler's number (≈2.71828)
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Current Daily Production:</strong> {formatNumber(calculateFarmingRewards(currentDate) * BLOCK_TIME_SECONDS / (24 * 60 * 60))} tokens/day
+            </div>
+            <div style={{ fontSize: '0.9rem', color: '#92400e' }}>
+              <strong>Note:</strong> This exponential decay model ensures sustainable token distribution over ~40 years
+            </div>
+          </div>
+          
+          <p style={{ 
+            color: '#92400e', 
+            fontSize: '0.95rem', 
+            marginTop: '15px',
+            fontStyle: 'italic'
+          }}>
+            <strong>Implementation:</strong> This equation is implemented in the <a href="https://github.com/autonomys-community/autonomys_circulating_supply" target="_blank" rel="noopener noreferrer" style={{color: '#92400e', textDecoration: 'underline'}}>autonomys_circulating_supply</a> repository using efficient chunked calculations for real-time updates.
           </p>
         </div>
       </section>
@@ -574,40 +718,7 @@ export default function TokenInfo() {
         </div>
       </section>
 
-      {/* Key Information */}
-      <section style={{ 
-        background: '#f8fafc', 
-        padding: '30px', 
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0'
-      }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: '#1f2937' }}>
-          Key Information
-        </h2>
-        <ul style={{ margin: 0, paddingLeft: '20px' }}>
-          <li style={{ marginBottom: '10px' }}>
-            <strong>Mainnet Phase-1:</strong> Launched November 6, 2024 - Storage & consensus layers
-          </li>
-          <li style={{ marginBottom: '10px' }}>
-            <strong>Token Minting:</strong> 65% of supply (650M tokens) minted at Phase-1 launch
-          </li>
-          <li style={{ marginBottom: '10px' }}>
-            <strong>Token Transferability:</strong> Disabled at protocol level until TGE (Mainnet Phase-2)
-          </li>
-          <li style={{ marginBottom: '10px' }}>
-            <strong>TGE date:</strong>  Mainnet Phase-2 launch (enabled transferability) on July 16, 2025.
-          </li>
-          <li style={{ marginBottom: '10px' }}>
-            <strong>Block Time:</strong> {BLOCK_TIME_SECONDS} seconds per block
-          </li>
-          <li style={{ marginBottom: '10px' }}>
-            <strong>Farming Started:</strong> November 6, 2024 (rewards accumulating but not transferable until TGE)
-          </li>
-          <li>
-            <strong>Vesting:</strong> Most allocations follow 12-month cliff + 36-month linear schedule (starts at TGE)
-          </li>
-        </ul>
-      </section>
+
 
       <footer style={{ 
         textAlign: 'center', 
