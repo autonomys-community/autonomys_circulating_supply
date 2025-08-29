@@ -9,36 +9,36 @@ npm install
 npm run dev
 ```
 
-Visit `https://www.ai3-supply.xyz/`
+Visit [https://www.ai3-supply.xyz/](https://www.ai3-supply.xyz/)
 
 ## API
 
 ### Full Data Endpoint
-**POST** `https://www.ai3-supply.xyz/api/circulating-supply`
+**POST** `https://www.ai3-supply.xyz/api`
 
 ```bash
 # Current data
-curl -X POST https://www.ai3-supply.xyz/api/circulating-supply
+curl -X POST https://www.ai3-supply.xyz/api
 
 # Historical data
-curl -X POST https://www.ai3-supply.xyz/api/circulating-supply \
+curl -X POST https://www.ai3-supply.xyz/api \
   -H "Content-Type: application/json" \
   -d '{"date": "2025-12-31T00:00:00Z"}'
 ```
 
 ### Simple Value Endpoints
-**GET** `https://www.ai3-supply.xyz/api/circulating-supply`
-- Returns just the circulating supply number (e.g., `111862763`)
+**GET** `https://www.ai3-supply.xyz/total-supply`
+- Returns just the total supply number (e.g., `1000000000`)
 
-**GET** `https://www.ai3-supply.xyz/api/total-supply`
-- Returns the total supply number (`1000000000`)
+**GET** `https://www.ai3-supply.xyz/circulating-supply`
+- Returns just the circulating supply number (e.g., `111862763`)
 
 ```bash
 # Get current circulating supply
-curl https://www.ai3-supply.xyz/api/circulating-supply
+curl https://www.ai3-supply.xyz/circulating-supply
 
 # Get total supply
-curl https://www.ai3-supply.xyz/api/total-supply
+curl https://www.ai3-supply.xyz/total-supply
 ```
 
 ## Features
@@ -51,3 +51,5 @@ curl https://www.ai3-supply.xyz/api/total-supply
 ## Links
 
 - [Official Tokenomics](https://subspace.foundation/tokenomics)
+- [This Code Repository](https://github.com/autonomys-community/autonomys_circulating_supply)
+- [BlockScience Research](https://github.com/BlockScience/subspace) - Dynamic reward issuance model
