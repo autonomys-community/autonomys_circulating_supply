@@ -265,6 +265,62 @@ export default function TokenInfo() {
         </div>
       </section>
 
+      {/* Summary Cards - Moved to Top */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '20px',
+        marginBottom: '40px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Total Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(tokenData.totalSupply)}
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #10b981, #047857)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Circulating Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(tokenData.currentCirculating)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            {formatPercent(tokenData.currentCirculating)}% of total
+            {tokenData.currentCirculating === 0 && (
+              <><br /><small>TGE pending - transfers disabled</small></>
+            )}
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(lockedTokens)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            {formatPercent(lockedTokens)}% of total
+          </p>
+        </div>
+      </div>
+
       {/* RPC vs Circulating Supply Explanation */}
       <section style={{ 
         background: '#fef3c7', 
@@ -338,19 +394,19 @@ export default function TokenInfo() {
               <strong>Step 1:</strong> Subtract all locked tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Investors: 215,300,000 (locked until July 2026)
+              • Investors: 215,263,087 (locked until July 2026)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Team: 94,900,000 (locked until July 2026)
+              • Team: 94,904,634 (locked until July 2026)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Autonomys Labs: 70,000,000 (DevCo Treasury locked)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Subspace Foundation: 150,000,000 (Long-term treasury locked)
+              • Subspace Foundation: 156,782,580 (Operations + Treasury locked)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Partners & Ambassadors: 24,300,000 (locked)
+              • Vendors & Ambassadors: 24,345,400 (locked)
             </div>
             <div style={{ marginBottom: '10px' }}>
               <strong>Step 2:</strong> Subtract future farming rewards (35% - already farmed)
@@ -376,7 +432,7 @@ export default function TokenInfo() {
               <strong>Final Equation:</strong>
             </div>
             <div style={{ fontFamily: 'monospace', fontSize: '1rem' }}>
-              Circulating Supply = 650,000,000 - 554,500,000 (locked) - {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)
+              Circulating Supply = 650,000,000 - 561,295,701 (locked) - {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)
             </div>
             <div style={{ fontFamily: 'monospace', fontSize: '1rem', marginTop: '5px' }}>
               = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total)
@@ -482,61 +538,7 @@ export default function TokenInfo() {
         </div>
       </section>
 
-      {/* Summary Cards */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '20px',
-        marginBottom: '50px'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Total Supply</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(tokenData.totalSupply)}
-          </p>
-        </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #10b981, #047857)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Circulating Supply</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(tokenData.currentCirculating)}
-          </p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatPercent(tokenData.currentCirculating)}% of total
-            {tokenData.currentCirculating === 0 && (
-              <><br /><small>TGE pending - transfers disabled</small></>
-            )}
-          </p>
-        </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(lockedTokens)}
-          </p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatPercent(lockedTokens)}% of total
-          </p>
-        </div>
-      </div>
+
 
       {/* Distribution Breakdown */}
       <section style={{ marginBottom: '50px' }}>
@@ -578,7 +580,7 @@ export default function TokenInfo() {
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
               }}>
-                <p><strong>{formatNumber(215_300_000)} tokens</strong></p>
+                <p><strong>{formatNumber(215_263_087)} tokens</strong></p>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
                   48-month lockup with 12-month cliff from TGE (July 16, 2025). 25% unlocked July 16, 2026, 
                   remaining 75% released linearly over 36 months.
@@ -621,9 +623,8 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Founders:</strong> {formatNumber(20_000_000)} tokens (2.00%)</p>
-                  <p>• <strong>Advisors:</strong> {formatNumber(23_500_000)} tokens (2.35%)</p>
-                  <p>• <strong>Staff:</strong> {formatNumber(51_400_000)} tokens (5.14%)</p>
+                  <p>• <strong>Founders + Staff:</strong> {formatNumber(71_426_634)} tokens (7.14%)</p>
+                  <p>• <strong>Advisors:</strong> {formatNumber(23_478_000)} tokens (2.35%)</p>
                 </div>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
                   Same vesting schedule: 12-month cliff from TGE (completed July 16, 2026), then linear release over 36 months.
@@ -707,8 +708,8 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Operations:</strong> {formatNumber(6_800_000)} tokens (0.68%) - <span style={{color: '#10b981'}}>Liquid</span></p>
-                  <p>• <strong>Treasury:</strong> {formatNumber(150_000_000)} tokens (15.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Operations:</strong> {formatNumber(6_782_580)} tokens (0.68%) - <span style={{color: '#10b981'}}>Liquid</span></p>
+                  <p>• <strong>Foundation Treasury:</strong> {formatNumber(150_000_000)} tokens (15.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
                 </div>
               </div>
             )}
@@ -790,7 +791,7 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Partners:</strong> {formatNumber(14_300_000)} tokens (1.43%)</p>
+                  <p>• <strong>Vendors:</strong> {formatNumber(14_345_400)} tokens (1.43%)</p>
                   <p>• <strong>Ambassadors:</strong> {formatNumber(10_000_000)} tokens (1.00%)</p>
                 </div>
               </div>
