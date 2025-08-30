@@ -377,7 +377,7 @@ export default function TokenInfo() {
           🧮 Circulating Supply Calculation:
         </h2>
         <p style={{ color: '#0c4a6e', marginBottom: '15px' }}>
-          <strong>Mathematical breakdown of how we get from 650M minted tokens to current circulating supply:</strong>
+          <strong>Mathematical breakdown of how we get from 1 billion tokens fixed total supply to current circulating supply:</strong>
         </p>
         <div style={{ background: 'rgba(255,255,255,0.8)', padding: '20px', borderRadius: '8px' }}>
           <div style={{ 
@@ -388,7 +388,7 @@ export default function TokenInfo() {
             marginBottom: '15px'
           }}>
             <div style={{ marginBottom: '10px' }}>
-              <strong>Starting Point:</strong> 650,000,000 tokens minted (65% of total supply)
+              <strong>Starting Point:</strong> 1,000,000,000 tokens total supply
             </div>
             <div style={{ marginBottom: '10px' }}>
               <strong>Step 1:</strong> Subtract all locked tokens
@@ -400,16 +400,19 @@ export default function TokenInfo() {
               • Team: 94,904,634 (locked until July 2026)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Autonomys Labs: 70,000,000 (DevCo Treasury locked)
+              • Autonomys Labs Treasury: 70,000,000 (locked until July 2026)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Subspace Foundation Treasury: 150,000,000 (locked)
+              • Subspace Foundation Long-Term Treasury: 100,000,000 (locked until July 2026)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Subspace Foundation Operations: 6,782,580 (unlocked)
+              • Subspace Foundation Near-Term Treasury: 50,000,000 (locked until TBD)
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Vendors & Ambassadors: 24,345,400 (locked)
+              • Vendors: 14,345,400 (locked until July 2026)
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Ambassadors: 10,000,000 (locked until January 2026, various vesting schedules)
             </div>
             <div style={{ marginBottom: '10px' }}>
               <strong>Step 2:</strong> Subtract future farming rewards (35% - already farmed)
@@ -435,7 +438,7 @@ export default function TokenInfo() {
               <strong>Final Equation:</strong>
             </div>
             <div style={{ fontFamily: 'monospace', fontSize: '1rem' }}>
-              Circulating Supply = 650,000,000 - 554,513,121 (locked) - {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)
+              Circulating Supply = 1,000,000,000 - 554,513,121 (locked) - {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)
             </div>
             <div style={{ fontFamily: 'monospace', fontSize: '1rem', marginTop: '5px' }}>
               = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total)
