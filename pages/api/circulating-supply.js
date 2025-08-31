@@ -1,6 +1,6 @@
 import { calculateCirculatingSupply, TGE_DATE } from '../../lib/tokenCalculations';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -22,7 +22,7 @@ export default function handler(req, res) {
     const requestTime = new Date();
     const tgeDate = TGE_DATE;
     
-    const circulatingSupply = calculateCirculatingSupply(requestTime, tgeDate);
+    const circulatingSupply = await calculateCirculatingSupply(requestTime, tgeDate);
     
     // Return just the number
     res.status(200).json(circulatingSupply);

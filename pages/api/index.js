@@ -1,6 +1,6 @@
 import { calculateCirculatingSupply, TGE_DATE } from '../../lib/tokenCalculations';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Set CORS headers for POST requests
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -35,7 +35,7 @@ export default function handler(req, res) {
       });
     }
     
-    const circulatingSupply = calculateCirculatingSupply(calculationDate, tgeDate);
+    const circulatingSupply = await calculateCirculatingSupply(calculationDate, tgeDate);
     const totalSupply = 1_000_000_000;
     const lockedSupply = totalSupply - circulatingSupply;
 
