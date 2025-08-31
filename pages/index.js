@@ -157,6 +157,62 @@ export default function TokenInfo() {
         </div>
       </header>
 
+      {/* Summary Cards - Moved to Top */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '20px',
+        marginBottom: '40px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Total Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(tokenData.totalSupply)}
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #10b981, #047857)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Circulating Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(tokenData.currentCirculating)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            {formatPercent(tokenData.currentCirculating)}% of total
+            {tokenData.currentCirculating === 0 && (
+              <><br /><small>TGE pending - transfers disabled</small></>
+            )}
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(lockedTokens)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            {formatPercent(lockedTokens)}% of total
+          </p>
+        </div>
+      </div>
+
       {/* API Quick Info - Top of Page */}
       <section style={{ 
         background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', 
@@ -306,62 +362,6 @@ export default function TokenInfo() {
           </p>
         </div>
       </section>
-
-      {/* Summary Cards - Moved to Top */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '20px',
-        marginBottom: '40px'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Total Supply</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(tokenData.totalSupply)}
-          </p>
-        </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #10b981, #047857)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Circulating Supply</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(tokenData.currentCirculating)}
-          </p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatPercent(tokenData.currentCirculating)}% of total
-            {tokenData.currentCirculating === 0 && (
-              <><br /><small>TGE pending - transfers disabled</small></>
-            )}
-          </p>
-        </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(lockedTokens)}
-          </p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatPercent(lockedTokens)}% of total
-          </p>
-        </div>
-      </div>
 
       {/* RPC vs Circulating Supply Explanation */}
       <section style={{ 
