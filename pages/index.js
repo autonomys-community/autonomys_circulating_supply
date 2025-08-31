@@ -415,10 +415,7 @@ export default function TokenInfo() {
               • Ambassadors: 10,000,000 (locked until January 2026, various vesting schedules)
             </div>
             <div style={{ marginBottom: '10px' }}>
-              <strong>Step 2:</strong> Subtract future farming rewards (35% - already farmed)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Total farming allocation: 350,000,000 tokens
+              <strong>Step 2:</strong> Subtract future farming rewards which is 350,000,000 minus those already farmed
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Already farmed: {formatNumber(calculateFarmingRewards(currentDate))} tokens
