@@ -39,14 +39,22 @@ curl https://www.ai3-supply.xyz/circulating-supply
 
 # Get total supply
 curl https://www.ai3-supply.xyz/total-supply
+
+# Get total staked amount
+curl https://www.ai3-supply.xyz/staking-info
+
+# Get detailed staking information
+curl https://www.ai3-supply.xyz/staking-info?detailed=true
 ```
 
 ## Features
 
 - Real-time circulating supply calculations
+- Integration with Autonomys Auto SDK for live staking data
 - Token distribution breakdown with vesting schedules
 - Multiple API endpoints for different use cases
 - Mobile-responsive design
+- Staking information API for monitoring
 
 ## Links
 
