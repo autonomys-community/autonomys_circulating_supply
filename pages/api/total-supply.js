@@ -19,8 +19,16 @@ export default function handler(req, res) {
   try {
     const totalSupply = 1_000_000_000; // 1 billion
     
-    // Return just the number
-    res.status(200).json(totalSupply);
+    // Check if CoinGecko format is requested
+    if (req.query.format === 'coingecko') {
+      // Return in CoinGecko format with 18 decimal places
+      res.status(200).json({
+        result: totalSupply.toFixed(18)
+      });
+    } else {
+      // Return just the number (default format)
+      res.status(200).json(totalSupply);
+    }
   } catch (error) {
     console.error('Error returning total supply:', error);
     res.status(500).json({ 

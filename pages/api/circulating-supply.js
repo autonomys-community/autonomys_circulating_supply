@@ -24,8 +24,15 @@ export default function handler(req, res) {
     
     const circulatingSupply = calculateCirculatingSupply(requestTime, tgeDate);
     
-    // Return just the number
-    res.status(200).json(circulatingSupply);
+    // Check if CoinGecko format is requested
+    if (req.query.format === 'coingecko') {
+      res.status(200).json({
+        result: circulatingSupply.toFixed(18)
+      });
+    } else {
+      // Return just the number
+      res.status(200).json(circulatingSupply);
+    }
   } catch (error) {
     console.error('Error calculating circulating supply:', error);
     res.status(500).json({ 

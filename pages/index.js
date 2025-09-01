@@ -184,7 +184,7 @@ export default function TokenInfo() {
               <strong>POST /api</strong>
             </h3>
             <p style={{ margin: '0 0 15px 0', fontSize: '0.95rem', opacity: 0.9 }}>
-              Full data + historical queries
+              Full data endpoint
             </p>
             <div style={{ 
               background: 'rgba(0,0,0,0.2)', 
@@ -207,10 +207,10 @@ export default function TokenInfo() {
           }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🔢</div>
             <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
-              <strong>GET /total-supply</strong>
+              <strong>GET api/total-supply</strong>
             </h3>
             <p style={{ margin: '0 0 15px 0', fontSize: '0.95rem', opacity: 0.9 }}>
-              Total supply only (1B tokens)
+              Total supply with optional CoinGecko format
             </p>
             <div style={{ 
               background: 'rgba(0,0,0,0.2)', 
@@ -219,7 +219,15 @@ export default function TokenInfo() {
               fontFamily: 'monospace',
               fontSize: '0.85rem'
             }}>
-              curl https://ai3-supply.xyz/total-supply
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Default format:</strong><br />
+                curl https://ai3-supply.xyz/api/total-supply
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>CoinGecko format:</strong><br />
+                curl https://ai3-supply.xyz/api/total-supply?format=coingecko
+              </div>
+
             </div>
           </div>
 
@@ -233,10 +241,10 @@ export default function TokenInfo() {
           }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>💰</div>
             <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
-              <strong>GET /circulating-supply</strong>
+              <strong>GET api/circulating-supply</strong>
             </h3>
             <p style={{ margin: '0 0 15px 0', fontSize: '0.95rem', opacity: 0.9 }}>
-              Current circulating supply
+              Current circulating supply with optional CoinGecko format
             </p>
             <div style={{ 
               background: 'rgba(0,0,0,0.2)', 
@@ -245,7 +253,14 @@ export default function TokenInfo() {
               fontFamily: 'monospace',
               fontSize: '0.85rem'
             }}>
-              curl https://ai3-supply.xyz/circulating-supply
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Default format:</strong><br />
+                curl https://ai3-supply.xyz/api/circulating-supply
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>CoinGecko format:</strong><br />
+                curl https://ai3-supply.xyz/api/circulating-supply?format=coingecko
+              </div>
             </div>
           </div>
         </div>
