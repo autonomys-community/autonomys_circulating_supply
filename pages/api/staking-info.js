@@ -1,4 +1,4 @@
-import { calculateCirculatingSupply, TGE_DATE } from '../../lib/tokenCalculations';
+import { getTotalStakedAmount } from '../../lib/stakingService.js';
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -19,25 +19,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const requestTime = new Date();
-    const tgeDate = TGE_DATE;
-    
-    const circulatingSupply = await calculateCirculatingSupply(requestTime, tgeDate);
-    
-    // Check if CoinGecko format is requested
-    if (req.query.format === 'coingecko') {
-      res.status(200).json({
-        result: circulatingSupply.toFixed(18)
-      });
-    } else {
-      // Return just the number
-      res.status(200).json(circulatingSupply);
-    }
+    const totalStaked = await getTotalStakedAmount();
+    res.status(200).json({
+      total_staked: totalStaked,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
-    console.error('Error calculating circulating supply:', error);
+    console.error('Error fetching staking information:', error);
     res.status(500).json({ 
       error: 'Internal server error',
-      message: 'Failed to calculate circulating supply'
+      message: 'Failed to fetch staking information',
+      details: error.message
     });
   }
 }

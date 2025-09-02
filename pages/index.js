@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { calculateCirculatingSupply, getTokenDistribution, calculateFarmingRewards, BLOCK_TIME_SECONDS, TGE_DATE } from '../lib/tokenCalculations';
+import { getTotalStakedAmount } from '../lib/stakingService';
 
 export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
+  const [totalStaked, setTotalStaked] = useState(0);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tgeDate, setTgeDate] = useState(TGE_DATE); // July 16, 2025 12:30PM EST
   const [expandedSections, setExpandedSections] = useState({
@@ -23,9 +25,23 @@ export default function TokenInfo() {
   };
 
   useEffect(() => {
-    const data = getTokenDistribution();
-    const circulating = calculateCirculatingSupply(currentDate, tgeDate);
-    setTokenData({ ...data, currentCirculating: circulating });
+    const loadTokenData = async () => {
+      try {
+        const data = await getTokenDistribution();
+        const circulating = await calculateCirculatingSupply(currentDate, tgeDate);
+        const staked = await getTotalStakedAmount();
+        setTokenData({ ...data, currentCirculating: circulating });
+        setTotalStaked(staked);
+      } catch (error) {
+        console.error('Error loading token data:', error);
+        // Fallback: load without staking data
+        const data = await getTokenDistribution();
+        setTokenData(data);
+        setTotalStaked(0);
+      }
+    };
+    
+    loadTokenData();
   }, [currentDate, tgeDate]);
 
   const formatNumber = (num) => {
@@ -141,6 +157,62 @@ export default function TokenInfo() {
         </div>
       </header>
 
+      {/* Summary Cards - Moved to Top */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '20px',
+        marginBottom: '40px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Total Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(tokenData.totalSupply)}
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #10b981, #047857)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Circulating Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(tokenData.currentCirculating)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            {formatPercent(tokenData.currentCirculating)}% of total
+            {tokenData.currentCirculating === 0 && (
+              <><br /><small>TGE pending - transfers disabled</small></>
+            )}
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(lockedTokens)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            {formatPercent(lockedTokens)}% of total
+          </p>
+        </div>
+      </div>
+
       {/* API Quick Info - Top of Page */}
       <section style={{ 
         background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', 
@@ -161,7 +233,7 @@ export default function TokenInfo() {
           🔌 <span>API Endpoints Available</span>
         </h2>
         <p style={{ fontSize: '1.1rem', marginBottom: '25px', opacity: 0.9 }}>
-          Three simple endpoints for developers and integrations
+          Four simple endpoints for developers and integrations
         </p>
         
         <div style={{ 
@@ -263,6 +335,32 @@ export default function TokenInfo() {
               </div>
             </div>
           </div>
+
+          {/* GET /staking-info */}
+          <div style={{ 
+            background: 'rgba(255,255,255,0.15)', 
+            padding: '20px', 
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.3)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🔒</div>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
+              <strong>GET /staking-info</strong>
+            </h3>
+            <p style={{ margin: '0 0 15px 0', fontSize: '0.95rem', opacity: 0.9 }}>
+              Total staked tokens (stake + storage fees)
+            </p>
+            <div style={{ 
+              background: 'rgba(0,0,0,0.2)', 
+              padding: '10px', 
+              borderRadius: '6px',
+              fontFamily: 'monospace',
+              fontSize: '0.85rem'
+            }}>
+              curl https://ai3-supply.xyz/api/staking-info
+            </div>
+          </div>
         </div>
 
         <div style={{ 
@@ -279,62 +377,6 @@ export default function TokenInfo() {
           </p>
         </div>
       </section>
-
-      {/* Summary Cards - Moved to Top */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '20px',
-        marginBottom: '40px'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Total Supply</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(tokenData.totalSupply)}
-          </p>
-        </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #10b981, #047857)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Circulating Supply</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(tokenData.currentCirculating)}
-          </p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatPercent(tokenData.currentCirculating)}% of total
-            {tokenData.currentCirculating === 0 && (
-              <><br /><small>TGE pending - transfers disabled</small></>
-            )}
-          </p>
-        </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(lockedTokens)}
-          </p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatPercent(lockedTokens)}% of total
-          </p>
-        </div>
-      </div>
 
       {/* RPC vs Circulating Supply Explanation */}
       <section style={{ 
@@ -430,16 +472,19 @@ export default function TokenInfo() {
               • Ambassadors: 10,000,000 (locked until January 2026, various vesting schedules)
             </div>
             <div style={{ marginBottom: '10px' }}>
-              <strong>Step 2:</strong> Subtract future farming rewards (35% - already farmed)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Total farming allocation: 350,000,000 tokens
+              <strong>Step 2:</strong> Subtract future farming rewards which is 350,000,000 minus those already farmed
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Already farmed: {formatNumber(calculateFarmingRewards(currentDate))} tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Remaining to farm: {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} tokens
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Step 3:</strong> Subtract tokens staked on domains
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Total staked: {formatNumber(totalStaked)} tokens
             </div>
           </div>
           
@@ -452,22 +497,16 @@ export default function TokenInfo() {
             <div style={{ fontFamily: 'monospace', fontSize: '1.1rem', marginBottom: '10px' }}>
               <strong>Final Equation:</strong>
             </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '1rem' }}>
-              Circulating Supply = 1,000,000,000 - 554,513,121 (locked) - {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)
+            <div style={{ fontFamily: 'monospace', fontSize: '1rem', lineHeight: '1.5' }}>
+              <div>Circulating Supply = 1,000,000,000</div>
+              <div style={{ marginLeft: '20px' }}>- 554,513,121 (locked tokens)</div>
+              <div style={{ marginLeft: '20px' }}>- {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)</div>
+              <div style={{ marginLeft: '20px' }}>- {formatNumber(totalStaked)} (staked tokens)</div>
             </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '1rem', marginTop: '5px' }}>
-              = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total)
+            <div style={{ fontFamily: 'monospace', fontSize: '1rem', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
+              = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
             </div>
           </div>
-          
-          <p style={{ 
-            color: '#0c4a6e', 
-            fontSize: '0.95rem', 
-            marginTop: '15px',
-            fontStyle: 'italic'
-          }}>
-            <strong>Note:</strong> Only testnet rewards, stake wars rewards, and market liquidity tokens are currently unlocked and transferable.
-          </p>
         </div>
       </section>
 
