@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { calculateCirculatingSupply, getTokenDistribution, calculateFarmingRewards, BLOCK_TIME_SECONDS, TGE_DATE } from '../lib/tokenCalculations';
+import { calculateCirculatingSupply, getTokenDistribution, getLockedTokensAmount } from '../lib/tokenCalculations';
 import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
@@ -8,9 +8,8 @@ export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
   const [totalStaked, setTotalStaked] = useState(0);
   const [consensusSupply, setConsensusSupply] = useState(0);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [tgeDate, setTgeDate] = useState(TGE_DATE);
   const [domainSupply, setDomainSupply] = useState(0);
+  const [lockedTokens, setLockedTokens] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -32,28 +31,30 @@ export default function TokenInfo() {
     const loadTokenData = async () => {
       try {
         const data = await getTokenDistribution();
-        const circulating = await calculateCirculatingSupply(currentDate, tgeDate);
+        const circulating = await calculateCirculatingSupply();
         const staked = await getTotalStakedAmount();
         const consensus = await getConsensusTokenSupply();
-        const domains = await getDomainTokenSupply(); 
+        const domains = await getDomainTokenSupply();
+        const locked = getLockedTokensAmount();
 
         setTokenData({ ...data, currentCirculating: circulating });
         setTotalStaked(staked);
         setConsensusSupply(consensus);
         setDomainSupply(domains);
+        setLockedTokens(locked);
       } catch (error) {
         console.error('Error loading token data:', error);
-        // Fallback: load without staking/consensus data
         const data = await getTokenDistribution();
         setTokenData(data);
         setTotalStaked(0);
         setConsensusSupply(0);
         setDomainSupply(0);
+        setLockedTokens(0);
       }
     };
     
     loadTokenData();
-  }, [currentDate, tgeDate]);
+  }, []);
 
   const formatNumber = (num) => {
     return new Intl.NumberFormat().format(num);
@@ -63,9 +64,15 @@ export default function TokenInfo() {
     return (num / 1000000000 * 100).toFixed(2);
   };
 
+  const formatLockedPercent = (lockedAmount) => {
+    const totalOnChainSupply = consensusSupply + domainSupply;
+    if (totalOnChainSupply === 0) return '0.00';
+    return (lockedAmount / totalOnChainSupply * 100).toFixed(2);
+  };
+
   if (!tokenData) return <div>Loading...</div>;
 
-  const lockedTokens = 1_000_000_000 - tokenData.currentCirculating;
+  const totalOnChainSupply = consensusSupply + domainSupply;
 
   return (
     <div style={{
@@ -77,7 +84,7 @@ export default function TokenInfo() {
     }}>
       <header style={{ textAlign: 'center', marginBottom: '50px' }}>
         <h1 style={{ fontSize: '3rem', color: '#2563eb', marginBottom: '10px' }}>
-          $AI3 Token Distribution
+          AI3 Token Distribution
         </h1>
         <p style={{ fontSize: '1.2rem', color: '#6b7280' }}>
           Autonomys Network Native Token Overview
@@ -107,7 +114,7 @@ export default function TokenInfo() {
               e.target.style.color = '#2563eb';
             }}
           >
-            📊 Official Tokenomics published by the Subspace Foundation (Source of Truth) →
+            Official Tokenomics (Source of Truth)
           </a>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexWrap: 'wrap', marginTop: '20px' }}>
@@ -136,7 +143,7 @@ export default function TokenInfo() {
               e.target.style.borderColor = '#d1d5db';
             }}
           >
-            🔗 <span>This Code Repository (GitHub)</span>
+            This Code Repository (GitHub)
           </a>
           <a 
             href="https://github.com/BlockScience/subspace" 
@@ -163,12 +170,12 @@ export default function TokenInfo() {
               e.target.style.borderColor = '#d1d5db';
             }}
           >
-            📚 <span>BlockScience Research (Dynamic Rewards Issuance Model)</span>
+            BlockScience Research
           </a>
         </div>
       </header>
 
-      {/* Summary Cards - Updated with Consensus Supply */}
+      {/* Summary Cards */}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
@@ -233,9 +240,6 @@ export default function TokenInfo() {
           </p>
           <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
             {formatPercent(tokenData.currentCirculating)}% of total
-            {tokenData.currentCirculating === 0 && (
-              <><br /><small>TGE pending - transfers disabled</small></>
-            )}
           </p>
         </div>
         
@@ -251,12 +255,12 @@ export default function TokenInfo() {
             {formatNumber(lockedTokens)}
           </p>
           <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatPercent(lockedTokens)}% of total
+            {formatLockedPercent(lockedTokens)}% of on-chain supply
           </p>
         </div>
       </div>
 
-      {/* API Quick Info - Top of Page */}
+      {/* API Endpoints */}
       <section style={{ 
         background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', 
         color: 'white',
@@ -273,7 +277,7 @@ export default function TokenInfo() {
           justifyContent: 'center',
           gap: '12px'
         }}>
-          🔌 <span>API Endpoints Available</span>
+          API Endpoints Available
         </h2>
         <p style={{ fontSize: '1.1rem', marginBottom: '25px', opacity: 0.9 }}>
           Four simple endpoints for developers and integrations
@@ -286,13 +290,11 @@ export default function TokenInfo() {
           maxWidth: '900px',
           margin: '0 auto'
         }}>
-          {/* POST /api */}
           <div style={{ 
             background: 'rgba(255,255,255,0.15)', 
             padding: '20px', 
             borderRadius: '12px',
-            border: '1px solid rgba(255,255,255,0.3)',
-            backdropFilter: 'blur(10px)'
+            border: '1px solid rgba(255,255,255,0.3)'
           }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>📊</div>
             <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
@@ -312,13 +314,11 @@ export default function TokenInfo() {
             </div>
           </div>
 
-          {/* GET /total-supply */}
           <div style={{ 
             background: 'rgba(255,255,255,0.15)', 
             padding: '20px', 
             borderRadius: '12px',
-            border: '1px solid rgba(255,255,255,0.3)',
-            backdropFilter: 'blur(10px)'
+            border: '1px solid rgba(255,255,255,0.3)'
           }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🔢</div>
             <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
@@ -342,17 +342,14 @@ export default function TokenInfo() {
                 <strong>CoinGecko format:</strong><br />
                 curl https://ai3-supply.xyz/api/total-supply?format=coingecko
               </div>
-
             </div>
           </div>
 
-          {/* GET /circulating-supply */}
           <div style={{ 
             background: 'rgba(255,255,255,0.15)', 
             padding: '20px', 
             borderRadius: '12px',
-            border: '1px solid rgba(255,255,255,0.3)',
-            backdropFilter: 'blur(10px)'
+            border: '1px solid rgba(255,255,255,0.3)'
           }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>💰</div>
             <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
@@ -379,13 +376,11 @@ export default function TokenInfo() {
             </div>
           </div>
 
-          {/* GET /staking-info */}
           <div style={{ 
             background: 'rgba(255,255,255,0.15)', 
             padding: '20px', 
             borderRadius: '12px',
-            border: '1px solid rgba(255,255,255,0.3)',
-            backdropFilter: 'blur(10px)'
+            border: '1px solid rgba(255,255,255,0.3)'
           }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🔒</div>
             <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem' }}>
@@ -421,44 +416,7 @@ export default function TokenInfo() {
         </div>
       </section>
 
-      {/* RPC vs Circulating Supply Explanation */}
-      <section style={{ 
-        background: '#fef3c7', 
-        border: '2px solid #f59e0b',
-        borderRadius: '12px',
-        padding: '25px',
-        marginBottom: '40px'
-      }}>
-        <h2 style={{ 
-          fontSize: '1.3rem', 
-          marginBottom: '15px', 
-          color: '#92400e',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          ⚠️ Important: RPC vs Circulating Supply Difference
-        </h2>
-        <p style={{ color: '#92400e', marginBottom: '15px' }}>
-          <strong>Why RPC queries show different numbers:</strong>
-        </p>
-        <div style={{ background: 'rgba(255,255,255,0.7)', padding: '20px', borderRadius: '8px' }}>
-          <p style={{ margin: '0 0 10px 0', color: '#1f2937' }}>
-            • <strong>Consensus Layer RPC:</strong> Shows all minted tokens (~650M+ tokens exist on-chain)
-          </p>
-          <p style={{ margin: '0 0 10px 0', color: '#1f2937' }}>
-            • <strong>Circulating Supply:</strong> Only counts tokens that can actually be transferred
-          </p>
-          <p style={{ margin: '0 0 10px 0', color: '#1f2937' }}>
-            • <strong>Key Difference:</strong> Querying circulating supply on the consensus chain shows tokens that will be moved to the Auto EVM domain chain, where they will be held in publicly auditable unlock contracts as per the schedule in the <a href="https://subspace.foundation/tokenomics" target="_blank" rel="noopener noreferrer" style={{color: '#92400e', textDecoration: 'underline'}}>tokenomics page</a>
-          </p>
-          <p style={{ margin: '10px 0 0 0', color: '#1f2937', fontSize: '0.95rem' }}>
-            <strong>Note:</strong> The consensus layer shows the total supply, but actual transferability and unlock schedules are managed through smart contracts on the EVM layer.
-          </p>
-        </div>
-      </section>
-
-      {/* Circulating Supply Calculation Equation */}
+      {/* Circulating Supply Calculation */}
       <section style={{ 
         background: '#f0f9ff', 
         border: '2px solid #0ea5e9',
@@ -469,179 +427,65 @@ export default function TokenInfo() {
         <h2 style={{ 
           fontSize: '1.3rem', 
           marginBottom: '15px', 
-          color: '#0c4a6e',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
+          color: '#0c4a6e'
         }}>
-          🧮 Circulating Supply Calculation:
+          Circulating Supply Calculation
         </h2>
         <p style={{ color: '#0c4a6e', marginBottom: '15px' }}>
-          <strong>Mathematical breakdown of how we get from 1 billion tokens fixed total supply to current circulating supply:</strong>
-        </p>
-        <div style={{ background: 'rgba(255,255,255,0.8)', padding: '20px', borderRadius: '8px' }}>
-          <div style={{ 
-            fontFamily: 'monospace', 
-            fontSize: '1.1rem', 
-            lineHeight: '1.8',
-            color: '#1f2937',
-            marginBottom: '15px'
-          }}>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Starting Point:</strong> 1,000,000,000 tokens total supply
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Step 1:</strong> Subtract all locked tokens
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Investors: 215,263,087 (locked until July 2026)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Team: 94,904,634 (locked until July 2026)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Autonomys Labs Treasury: 70,000,000 (locked until July 2026)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Subspace Foundation Long-Term Treasury: 100,000,000 (locked until July 2026)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Subspace Foundation Near-Term Treasury: 50,000,000 (locked until TBD)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Vendors: 14,345,400 (locked until July 2026)
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Ambassadors: 10,000,000 (locked until January 2026, various vesting schedules)
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Step 2:</strong> Subtract future farming rewards which is 350,000,000 minus those already farmed
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Already farmed: {formatNumber(calculateFarmingRewards(currentDate))} tokens
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Remaining to farm: {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} tokens
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Step 3:</strong> Subtract tokens staked on domains
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Total staked: {formatNumber(totalStaked)} tokens
-            </div>
-          </div>
-          
-          <div style={{ 
-            background: '#e0f2fe', 
-            padding: '15px', 
-            borderRadius: '8px',
-            border: '1px solid #0ea5e9'
-          }}>
-            <div style={{ fontFamily: 'monospace', fontSize: '1.1rem', marginBottom: '10px' }}>
-              <strong>Final Equation:</strong>
-            </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '1rem', lineHeight: '1.5' }}>
-              <div>Circulating Supply = 1,000,000,000</div>
-              <div style={{ marginLeft: '20px' }}>- 554,513,121 (locked tokens)</div>
-              <div style={{ marginLeft: '20px' }}>- {formatNumber(350_000_000 - calculateFarmingRewards(currentDate))} (future farming)</div>
-              <div style={{ marginLeft: '20px' }}>- {formatNumber(totalStaked)} (staked tokens)</div>
-            </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '1rem', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
-              = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BlockScience Dynamic Issuance Model */}
-      <section style={{ 
-        background: '#fefce8', 
-        border: '2px solid #eab308',
-        borderRadius: '12px',
-        padding: '25px',
-        marginBottom: '40px'
-      }}>
-        <h2 style={{ 
-          fontSize: '1.3rem', 
-          marginBottom: '15px', 
-          color: '#92400e',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          📚 BlockScience Dynamic Issuance Model
-        </h2>
-        <p style={{ color: '#92400e', marginBottom: '15px' }}>
-          <strong>Exact mathematical equation for farming rewards calculation:</strong>
+          <strong>How circulating supply is calculated from real on-chain data:</strong>
         </p>
         <div style={{ background: 'rgba(255,255,255,0.8)', padding: '20px', borderRadius: '8px' }}>
           <div style={{ 
             fontFamily: 'monospace', 
             fontSize: '1rem', 
             lineHeight: '1.6',
-            color: '#1f2937',
-            marginBottom: '15px'
+            color: '#1f2937'
           }}>
-            <div style={{ marginBottom: '15px' }}>
-              <strong>Source:</strong> <a href="https://academy.autonomys.xyz/autonomys-network/rewards-and-fees" target="_blank" rel="noopener noreferrer" style={{color: '#92400e', textDecoration: 'underline'}}>Autonomys Network Academy</a>
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <strong>Research Repository:</strong> <a href="https://github.com/BlockScience/subspace" target="_blank" rel="noopener noreferrer" style={{color: '#92400e', textDecoration: 'underline'}}>BlockScience Subspace Economic Model</a>
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <strong>Key Parameters:</strong>
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Step 1:</strong> Get total on-chain supply
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Initial Subsidy: 5.0 AI3 per block
+              • Consensus Chain: {formatNumber(consensusSupply)} tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Max Issuance: 350,000,000 tokens (35% of total supply)
+              • All Domains: {formatNumber(domainSupply)} tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Block Time: {BLOCK_TIME_SECONDS} seconds
+              • Total On-Chain: {formatNumber(totalOnChainSupply)} tokens
+            </div>
+            
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Step 2:</strong> Subtract staked tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Decay Start: Block 0 (immediate decay from activation)
+              • Total Staked: {formatNumber(totalStaked)} tokens
+            </div>
+            
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Step 3:</strong> Subtract locked allocations
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Locked Tokens: {formatNumber(lockedTokens)} tokens
+            </div>
+            
+            <div style={{ 
+              background: '#e0f2fe', 
+              padding: '15px', 
+              borderRadius: '8px',
+              border: '1px solid #0ea5e9',
+              marginTop: '15px'
+            }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
+                Final Calculation:
+              </div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)}</div>
+              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
+                = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
+              </div>
             </div>
           </div>
-          
-          <div style={{ 
-            background: '#fef3c7', 
-            padding: '20px', 
-            borderRadius: '8px',
-            border: '1px solid #f59e0b',
-            fontFamily: 'monospace',
-            fontSize: '1.1rem'
-          }}>
-            <div style={{ marginBottom: '15px', fontWeight: 'bold' }}>
-              🧮 BlockScience Dynamic Issuance Equation:
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>reference_subsidy = initial_subsidy × e^(-initial_subsidy × (n - decay_block_start) / max_issuance_tokens)</strong>
-            </div>
-            <div style={{ fontSize: '0.9rem', color: '#92400e', marginBottom: '15px' }}>
-              Where: n = current block number, e = Euler's number (≈2.71828)
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Current Daily Production:</strong> {formatNumber(calculateFarmingRewards(currentDate) * BLOCK_TIME_SECONDS / (24 * 60 * 60))} tokens/day
-            </div>
-            <div style={{ fontSize: '0.9rem', color: '#92400e' }}>
-              <strong>Note:</strong> This exponential decay model ensures sustainable token distribution over ~40 years
-            </div>
-          </div>
-          
-          <p style={{ 
-            color: '#92400e', 
-            fontSize: '0.95rem', 
-            marginTop: '15px',
-            fontStyle: 'italic'
-          }}>
-            <strong>Implementation:</strong> This equation is implemented in the <a href="https://github.com/autonomys-community/autonomys_circulating_supply" target="_blank" rel="noopener noreferrer" style={{color: '#92400e', textDecoration: 'underline'}}>autonomys_circulating_supply</a> repository using efficient chunked calculations for real-time updates.
-          </p>
         </div>
       </section>
-
-
 
       {/* Distribution Breakdown */}
       <section style={{ marginBottom: '50px' }}>
@@ -685,8 +529,7 @@ export default function TokenInfo() {
               }}>
                 <p><strong>{formatNumber(215_263_087)} tokens</strong></p>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                  48-month lockup with 12-month cliff from TGE (July 16, 2025). 25% unlocked July 16, 2026, 
-                  remaining 75% released linearly over 36 months.
+                  Locked allocation. Tokens are held in reserve and not yet distributed.
                 </p>
               </div>
             )}
@@ -730,7 +573,7 @@ export default function TokenInfo() {
                   <p>• <strong>Advisors:</strong> {formatNumber(23_478_000)} tokens (2.35%)</p>
                 </div>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                  Same vesting schedule: 12-month cliff from TGE (completed July 16, 2026), then linear release over 36 months.
+                  Locked allocations. Tokens are held in reserve and not yet distributed.
                 </p>
               </div>
             )}
@@ -770,8 +613,8 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>DevCo Treasury:</strong> {formatNumber(70_000_000)} tokens (7.00%)</p>
-                  <p>• <strong>Market Liquidity:</strong> {formatNumber(20_000_000)} tokens (2.00%) - <span style={{color: '#10b981'}}>Unlocked at TGE</span></p>
+                  <p>• <strong>DevCo Treasury:</strong> {formatNumber(70_000_000)} tokens (7.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Market Liquidity:</strong> {formatNumber(20_000_000)} tokens (2.00%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
                 </div>
               </div>
             )}
@@ -811,8 +654,9 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Operations:</strong> {formatNumber(6_782_580)} tokens (0.68%) - <span style={{color: '#10b981'}}>Liquid</span></p>
-                  <p>• <strong>Foundation Treasury:</strong> {formatNumber(150_000_000)} tokens (15.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Operations:</strong> {formatNumber(6_782_580)} tokens (0.68%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
+                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(50_000_000)} tokens (5.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Long-Term Treasury:</strong> {formatNumber(100_000_000)} tokens (10.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
                 </div>
               </div>
             )}
@@ -894,8 +738,8 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Vendors:</strong> {formatNumber(14_345_400)} tokens (1.43%)</p>
-                  <p>• <strong>Ambassadors:</strong> {formatNumber(10_000_000)} tokens (1.00%)</p>
+                  <p>• <strong>Vendors:</strong> {formatNumber(14_345_400)} tokens (1.43%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Ambassadors:</strong> {formatNumber(10_000_000)} tokens (1.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
                 </div>
               </div>
             )}
@@ -936,16 +780,13 @@ export default function TokenInfo() {
               }}>
                 <p><strong>{formatNumber(350_000_000)} tokens</strong></p>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                  Minted as block rewards over ~40 years using BlockScience dynamic issuance model. 
-                  Rewards activated November 26, 2024. Currently issued: {formatNumber(calculateFarmingRewards(currentDate))} tokens.
+                  Minted as block rewards for farmers. The portion already minted appears in the on-chain supply above.
                 </p>
               </div>
             )}
           </div>
         </div>
       </section>
-
-
 
       <footer style={{ 
         textAlign: 'center', 
@@ -966,10 +807,8 @@ export default function TokenInfo() {
               fontSize: '1.1rem'
             }}
           >
-            📊 Official Tokenomics →
+            Official Tokenomics
           </a>
-        </div>
-        <div style={{ marginBottom: '20px' }}>
           <a 
             href="https://github.com/autonomys-community/autonomys_circulating_supply" 
             target="_blank" 
@@ -977,32 +816,14 @@ export default function TokenInfo() {
             style={{ 
               color: '#2563eb', 
               textDecoration: 'none',
-              marginRight: '30px',
               fontSize: '1.1rem'
             }}
           >
-            🔗 This Code Repository (GitHub) →
-          </a>
-          <a 
-            href="https://github.com/BlockScience/subspace" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ 
-              color: '#2563eb', 
-              textDecoration: 'none',
-              marginRight: '30px',
-              fontSize: '1.1rem'
-            }}
-          >
-            📚 BlockScience Research (Dynamic Rewards Issuance Model) →
+            Code Repository
           </a>
         </div>
         <p style={{ fontSize: '0.9rem', marginTop: '15px' }}>
-          <strong>Note:</strong> API uses POST requests with real-time calculations. 
-          Send POST to https://ai3-supply.xyz/api/ for the current data.
-        </p>
-        <p style={{ fontSize: '0.9rem', marginTop: '10px', color: '#9ca3af' }}>
-          <strong>Sources:</strong> Dynamic reward issuance calculations based on <a href="https://github.com/BlockScience/subspace" target="_blank" rel="noopener noreferrer" style={{color: '#6b7280', textDecoration: 'underline'}}>BlockScience's Subspace economic model</a> research.
+          Real-time calculations using on-chain data from consensus and domain layers
         </p>
       </footer>
     </div>
