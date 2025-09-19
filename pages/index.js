@@ -218,12 +218,28 @@ export default function TokenInfo() {
           borderRadius: '12px',
           textAlign: 'center'
         }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Domains Token Supply</h3>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Domain Token Supply</h3>
           <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
             {formatNumber(domainSupply)}
           </p>
           <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
             Total across all domains
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Staked Tokens</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(totalStaked)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            Locked in domain staking
           </p>
         </div>
         
@@ -252,10 +268,10 @@ export default function TokenInfo() {
         }}>
           <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
           <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(lockedTokens)}
+            {formatNumber(lockedTokens + totalStaked)}
           </p>
           <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            {formatLockedPercent(lockedTokens)}% of on-chain supply
+            Vesting + Staked ({formatLockedPercent(lockedTokens + totalStaked)}% of on-chain)
           </p>
         </div>
       </div>
