@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { calculateCirculatingSupply, getTokenDistribution, calculateFarmingRewards, BLOCK_TIME_SECONDS, TGE_DATE } from '../lib/tokenCalculations';
 import { getTotalStakedAmount } from '../lib/stakingService';
+import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
+import { getDomainTokenSupply } from '../lib/domainsSupplyService';
 
 export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
   const [totalStaked, setTotalStaked] = useState(0);
+  const [consensusSupply, setConsensusSupply] = useState(0);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [tgeDate, setTgeDate] = useState(TGE_DATE); // July 16, 2025 12:30PM EST
+  const [tgeDate, setTgeDate] = useState(TGE_DATE);
+  const [domainSupply, setDomainSupply] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -30,14 +34,21 @@ export default function TokenInfo() {
         const data = await getTokenDistribution();
         const circulating = await calculateCirculatingSupply(currentDate, tgeDate);
         const staked = await getTotalStakedAmount();
+        const consensus = await getConsensusTokenSupply();
+        const domains = await getDomainTokenSupply(); 
+
         setTokenData({ ...data, currentCirculating: circulating });
         setTotalStaked(staked);
+        setConsensusSupply(consensus);
+        setDomainSupply(domains);
       } catch (error) {
         console.error('Error loading token data:', error);
-        // Fallback: load without staking data
+        // Fallback: load without staking/consensus data
         const data = await getTokenDistribution();
         setTokenData(data);
         setTotalStaked(0);
+        setConsensusSupply(0);
+        setDomainSupply(0);
       }
     };
     
@@ -157,7 +168,7 @@ export default function TokenInfo() {
         </div>
       </header>
 
-      {/* Summary Cards - Moved to Top */}
+      {/* Summary Cards - Updated with Consensus Supply */}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
@@ -174,6 +185,38 @@ export default function TokenInfo() {
           <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Total Supply</h3>
           <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
             {formatNumber(tokenData.totalSupply)}
+          </p>
+        </div>
+
+        <div style={{
+          background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Consensus Chain Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(consensusSupply)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            On-chain minted tokens
+          </p>
+        </div>
+        
+        <div style={{
+          background: 'linear-gradient(135deg, #ec4899, #be185d)',
+          color: 'white',
+          padding: '30px',
+          borderRadius: '12px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Domain Token Supply</h3>
+          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
+            {formatNumber(domainSupply)}
+          </p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
+            Total across all domains
           </p>
         </div>
         
