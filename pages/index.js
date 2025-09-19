@@ -218,7 +218,7 @@ export default function TokenInfo() {
           borderRadius: '12px',
           textAlign: 'center'
         }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Domain Token Supply</h3>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Domains Token Supply</h3>
           <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
             {formatNumber(domainSupply)}
           </p>
