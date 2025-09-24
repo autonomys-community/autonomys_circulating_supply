@@ -30,13 +30,25 @@ export default function TokenInfo() {
   useEffect(() => {
     const loadTokenData = async () => {
       try {
-        const data = await getTokenDistribution();
-        const circulating = await calculateCirculatingSupply();
-        const staked = await getTotalStakedAmount();
-        const consensus = await getConsensusTokenSupply();
-        const domains = await getDomainTokenSupply();
+        // Parallelize all async calls using Promise.all
+        const [
+          data,
+          circulating,
+          staked,
+          consensus,
+          domains
+        ] = await Promise.all([
+          getTokenDistribution(),
+          calculateCirculatingSupply(),
+          getTotalStakedAmount(),
+          getConsensusTokenSupply(),
+          getDomainTokenSupply()
+        ]);
+
+        // Get locked tokens (synchronous)
         const locked = getLockedTokensAmount();
 
+        // Set all state values
         setTokenData({ ...data, currentCirculating: circulating });
         setTotalStaked(staked);
         setConsensusSupply(consensus);
@@ -44,8 +56,16 @@ export default function TokenInfo() {
         setLockedTokens(locked);
       } catch (error) {
         console.error('Error loading token data:', error);
-        const data = await getTokenDistribution();
-        setTokenData(data);
+        
+        // Fallback: try to get basic data and set zeros for failed calls
+        try {
+          const data = await getTokenDistribution();
+          setTokenData(data);
+        } catch (fallbackError) {
+          console.error('Failed to load fallback data:', fallbackError);
+        }
+        
+        // Set fallback values
         setTotalStaked(0);
         setConsensusSupply(0);
         setDomainSupply(0);
