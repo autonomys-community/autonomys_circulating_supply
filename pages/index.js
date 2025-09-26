@@ -93,6 +93,26 @@ export default function TokenInfo() {
   if (!tokenData) return <div>Loading...</div>;
 
   const totalOnChainSupply = consensusSupply + domainSupply;
+  const a = tokenData.allocations;
+  const investors = a.investors;
+  const team = a.team;
+  const autonomysLabs = a.autonomysLabs;
+  const foundation = a.subspaceFoundation;
+  const testnets = a.testnets;
+  const vendors = a.vendors;
+  const ambassadors = a.ambassadors;
+  const farmerRewards = a.farmerRewards;
+
+  const teamPercent = (team.foundersAndStaff.percent + team.advisors.percent).toFixed(2);
+  const autonomysPercent = (autonomysLabs.devcoTreasury.percent + autonomysLabs.marketLiquidity.percent).toFixed(2);
+  const foundationPercent = (
+    foundation.operations.percent +
+    foundation.nearTermTreasury.percent +
+    foundation.GuardiansOfGrowthStakingIncentive.percent +
+    foundation.longTermTreasury.percent
+  ).toFixed(2);
+  const testnetsPercent = (testnets.testnetRewards.percent + testnets.stakeWars1.percent + testnets.stakeWars2.percent).toFixed(2);
+  const partnersAmbassadorsPercent = (vendors.percent + ambassadors.percent).toFixed(2);
 
   return (
     <div style={{
@@ -549,7 +569,7 @@ export default function TokenInfo() {
               marginBottom: expandedSections.investors ? '15px' : '0'
             }} onClick={() => toggleSection('investors')}>
               <h3 style={{ color: '#1f2937', margin: 0 }}>
-                💼 Investors (21.53%)
+                💼 Investors ({investors.percent.toFixed(2)}%)
               </h3>
               <button style={{
                 background: 'none',
@@ -567,7 +587,7 @@ export default function TokenInfo() {
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
               }}>
-                <p><strong>{formatNumber(215_263_087)} tokens</strong></p>
+                <p><strong>{formatNumber(investors.tokens)} tokens</strong></p>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
                   Locked allocation. Tokens are held in reserve and not yet distributed.
                 </p>
@@ -590,7 +610,7 @@ export default function TokenInfo() {
               marginBottom: expandedSections.team ? '15px' : '0'
             }} onClick={() => toggleSection('team')}>
               <h3 style={{ color: '#1f2937', margin: 0 }}>
-                👥 Team (9.49%)
+                👥 Team ({teamPercent}%)
               </h3>
               <button style={{
                 background: 'none',
@@ -609,8 +629,8 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Founders + Staff:</strong> {formatNumber(71_426_634)} tokens (7.14%)</p>
-                  <p>• <strong>Advisors:</strong> {formatNumber(23_478_000)} tokens (2.35%)</p>
+                  <p>• <strong>Founders + Staff:</strong> {formatNumber(team.foundersAndStaff.tokens)} tokens ({team.foundersAndStaff.percent.toFixed(2)}%)</p>
+                  <p>• <strong>Advisors:</strong> {formatNumber(team.advisors.tokens)} tokens ({team.advisors.percent.toFixed(2)}%)</p>
                 </div>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
                   Locked allocations. Tokens are held in reserve and not yet distributed.
@@ -634,7 +654,7 @@ export default function TokenInfo() {
               marginBottom: expandedSections.autonomysLabs ? '15px' : '0'
             }} onClick={() => toggleSection('autonomysLabs')}>
               <h3 style={{ color: '#1f2937', margin: 0 }}>
-                🏢 Autonomys Labs (9.00%)
+                🏢 Autonomys Labs ({autonomysPercent}%)
               </h3>
               <button style={{
                 background: 'none',
@@ -653,8 +673,8 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>DevCo Treasury:</strong> {formatNumber(70_000_000)} tokens (7.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
-                  <p>• <strong>Market Liquidity:</strong> {formatNumber(20_000_000)} tokens (2.00%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
+                  <p>• <strong>DevCo Treasury:</strong> {formatNumber(autonomysLabs.devcoTreasury.tokens)} tokens ({autonomysLabs.devcoTreasury.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{autonomysLabs.devcoTreasury.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
+                  <p>• <strong>Market Liquidity:</strong> {formatNumber(autonomysLabs.marketLiquidity.tokens)} tokens ({autonomysLabs.marketLiquidity.percent.toFixed(2)}%) - <span style={{color: '#10b981'}}>{autonomysLabs.marketLiquidity.vesting === 'unlocked' ? 'Unlocked' : 'Locked'}</span></p>
                 </div>
               </div>
             )}
@@ -675,7 +695,7 @@ export default function TokenInfo() {
               marginBottom: expandedSections.subspaceFoundation ? '15px' : '0'
             }} onClick={() => toggleSection('subspaceFoundation')}>
               <h3 style={{ color: '#1f2937', margin: 0 }}>
-                🏛️ Subspace Foundation (15.68%)
+                🏛️ Subspace Foundation ({foundationPercent}%)
               </h3>
               <button style={{
                 background: 'none',
@@ -694,10 +714,10 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Operations:</strong> {formatNumber(6_782_580)} tokens (0.68%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
-                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(45_000_000)} tokens (4.50%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
-                  <p>• <strong>Guardians of Growth Staking Incentive:</strong> {formatNumber(5_000_000)} tokens (0.50%) - <span style={{color: '#f59e0b'}}>Dynamic</span></p>
-                  <p>• <strong>Long-Term Treasury:</strong> {formatNumber(100_000_000)} tokens (10.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Operations:</strong> {formatNumber(foundation.operations.tokens)} tokens ({foundation.operations.percent.toFixed(2)}%) - <span style={{color: '#10b981'}}>{foundation.operations.vesting === 'unlocked' ? 'Unlocked' : 'Locked'}</span></p>
+                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(foundation.nearTermTreasury.tokens)} tokens ({foundation.nearTermTreasury.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{foundation.nearTermTreasury.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
+                  <p>• <strong>Guardians of Growth Staking Incentive:</strong> {formatNumber(foundation.GuardiansOfGrowthStakingIncentive.tokens)} tokens ({foundation.GuardiansOfGrowthStakingIncentive.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>Dynamic</span></p>
+                  <p>• <strong>Long-Term Treasury:</strong> {formatNumber(foundation.longTermTreasury.tokens)} tokens ({foundation.longTermTreasury.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{foundation.longTermTreasury.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
                 </div>
               </div>
             )}
@@ -718,7 +738,7 @@ export default function TokenInfo() {
               marginBottom: expandedSections.testnets ? '15px' : '0'
             }} onClick={() => toggleSection('testnets')}>
               <h3 style={{ color: '#1f2937', margin: 0 }}>
-                🧪 Testnets/Stake Wars (6.87%)
+                🧪 Testnets/Stake Wars ({testnetsPercent}%)
               </h3>
               <button style={{
                 background: 'none',
@@ -737,9 +757,9 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Testnet Rewards:</strong> {formatNumber(59_700_000)} tokens (5.97%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
-                  <p>• <strong>Stake Wars 1:</strong> {formatNumber(6_000_000)} tokens (0.60%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
-                  <p>• <strong>Stake Wars 2:</strong> {formatNumber(3_000_000)} tokens (0.30%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Testnet Rewards:</strong> {formatNumber(testnets.testnetRewards.tokens)} tokens ({testnets.testnetRewards.percent.toFixed(2)}%) - <span style={{color: '#10b981'}}>{testnets.testnetRewards.vesting === 'unlocked' ? 'Unlocked' : 'Locked'}</span></p>
+                  <p>• <strong>Stake Wars 1:</strong> {formatNumber(testnets.stakeWars1.tokens)} tokens ({testnets.stakeWars1.percent.toFixed(2)}%) - <span style={{color: '#10b981'}}>{testnets.stakeWars1.vesting === 'unlocked' ? 'Unlocked' : 'Locked'}</span></p>
+                  <p>• <strong>Stake Wars 2:</strong> {formatNumber(testnets.stakeWars2.tokens)} tokens ({testnets.stakeWars2.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{testnets.stakeWars2.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
                 </div>
               </div>
             )}
@@ -760,7 +780,7 @@ export default function TokenInfo() {
               marginBottom: expandedSections.partnersAmbassadors ? '15px' : '0'
             }} onClick={() => toggleSection('partnersAmbassadors')}>
               <h3 style={{ color: '#1f2937', margin: 0 }}>
-                🤝 Partners & Ambassadors (2.43%)
+                🤝 Partners & Ambassadors ({partnersAmbassadorsPercent}%)
               </h3>
               <button style={{
                 background: 'none',
@@ -779,8 +799,8 @@ export default function TokenInfo() {
                 transition: 'all 0.3s ease'
               }}>
                 <div style={{ marginLeft: '20px' }}>
-                  <p>• <strong>Vendors:</strong> {formatNumber(14_345_400)} tokens (1.43%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
-                  <p>• <strong>Ambassadors:</strong> {formatNumber(10_000_000)} tokens (1.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Vendors:</strong> {formatNumber(vendors.tokens)} tokens ({vendors.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{vendors.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
+                  <p>• <strong>Ambassadors:</strong> {formatNumber(ambassadors.tokens)} tokens ({ambassadors.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{ambassadors.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
                 </div>
               </div>
             )}
