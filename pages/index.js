@@ -524,8 +524,7 @@ export default function TokenInfo() {
               • Locked Tokens: {formatNumber(lockedTokens)} tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px', color: '#0c4a6e' }}>
-              • Guardians of Growth Dynamic Lock: 5,000,000 − current free balance of the
-              designated Guardians wallet (fetched live from chain).
+              • Guardians of Growth Dynamic Lock: current free balance of the designated Guardians wallet (fetched live from chain).
             </div>
             
             <div style={{ 
