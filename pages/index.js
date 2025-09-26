@@ -291,7 +291,7 @@ export default function TokenInfo() {
             {formatNumber(lockedTokens + totalStaked)}
           </p>
           <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            Vesting + Staked ({formatLockedPercent(lockedTokens + totalStaked)}% of on-chain)
+            Vesting + Staked
           </p>
         </div>
       </div>
@@ -503,6 +503,10 @@ export default function TokenInfo() {
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Locked Tokens: {formatNumber(lockedTokens)} tokens
             </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px', color: '#0c4a6e' }}>
+              • Guardians of Growth Dynamic Lock: 5,000,000 − current free balance of the
+              designated Guardians wallet (fetched live from chain).
+            </div>
             
             <div style={{ 
               background: '#e0f2fe', 
@@ -691,7 +695,8 @@ export default function TokenInfo() {
               }}>
                 <div style={{ marginLeft: '20px' }}>
                   <p>• <strong>Operations:</strong> {formatNumber(6_782_580)} tokens (0.68%) - <span style={{color: '#10b981'}}>Unlocked</span></p>
-                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(50_000_000)} tokens (5.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(45_000_000)} tokens (4.50%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
+                  <p>• <strong>Guardians of Growth Staking Incentive:</strong> {formatNumber(5_000_000)} tokens (0.50%) - <span style={{color: '#f59e0b'}}>Dynamic</span></p>
                   <p>• <strong>Long-Term Treasury:</strong> {formatNumber(100_000_000)} tokens (10.00%) - <span style={{color: '#f59e0b'}}>Locked</span></p>
                 </div>
               </div>
