@@ -528,7 +528,7 @@ export default function TokenInfo() {
               • Locked Tokens: {formatNumber(lockedTokens)} tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px', color: '#0c4a6e' }}>
-              • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens, dynamic lock based on current free balance of the designated Guardians wallet.
+              • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens
             </div>
             
             <div style={{ 
