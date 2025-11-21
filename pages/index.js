@@ -527,7 +527,7 @@ export default function TokenInfo() {
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Locked Tokens: {formatNumber(lockedTokens)} tokens
             </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px', color: '#0c4a6e' }}>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens
             </div>
             
