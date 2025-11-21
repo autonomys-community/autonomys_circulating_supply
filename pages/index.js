@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { calculateCirculatingSupply, getTokenDistribution, getLockedTokensAmount } from '../lib/tokenCalculations';
+import { calculateCirculatingSupply, getTokenDistribution, getLockedTokensAmount, getGuardiansStakingIncentiveToVest } from '../lib/tokenCalculations';
 import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
@@ -10,6 +10,7 @@ export default function TokenInfo() {
   const [consensusSupply, setConsensusSupply] = useState(0);
   const [domainSupply, setDomainSupply] = useState(0);
   const [lockedTokens, setLockedTokens] = useState(0);
+  const [guardiansToVest, setGuardiansToVest] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -36,13 +37,15 @@ export default function TokenInfo() {
           circulating,
           staked,
           consensus,
-          domains
+          domains,
+          guardiansToVestAmount
         ] = await Promise.all([
           getTokenDistribution(),
           calculateCirculatingSupply(),
           getTotalStakedAmount(),
           getConsensusTokenSupply(),
-          getDomainTokenSupply()
+          getDomainTokenSupply(),
+          getGuardiansStakingIncentiveToVest()
         ]);
 
         // Get locked tokens (synchronous)
@@ -54,6 +57,7 @@ export default function TokenInfo() {
         setConsensusSupply(consensus);
         setDomainSupply(domains);
         setLockedTokens(locked);
+        setGuardiansToVest(guardiansToVestAmount || 0);
       } catch (error) {
         console.error('Error loading token data:', error);
         
@@ -524,7 +528,7 @@ export default function TokenInfo() {
               • Locked Tokens: {formatNumber(lockedTokens)} tokens
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px', color: '#0c4a6e' }}>
-              • Guardians of Growth Dynamic Lock: current free balance of the designated Guardians wallet (fetched live from chain).
+              • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens, dynamic lock based on current free balance of the designated Guardians wallet.
             </div>
             
             <div style={{ 
@@ -537,7 +541,7 @@ export default function TokenInfo() {
               <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
                 Final Calculation:
               </div>
-              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)}</div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)}</div>
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
                 = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
               </div>
