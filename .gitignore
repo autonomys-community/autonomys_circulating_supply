@@ -2,6 +2,7 @@
 /node_modules
 /.pnp
 .pnp.js
+.tool-versions
 
 # Next.js
 /.next/
