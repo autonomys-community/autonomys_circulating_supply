@@ -532,6 +532,10 @@ export default function TokenInfo() {
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Locked Tokens: {formatNumber(lockedTokens)} tokens
             </div>
+
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Step 4:</strong> Subtract other tokens not in circulation
+            </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens
             </div>
