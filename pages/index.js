@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { calculateCirculatingSupply, getTokenDistribution, getLockedTokensAmount, getGuardiansStakingIncentiveToVest } from '../lib/tokenCalculations';
+import { getNearTermTreasuryWalletBalance } from '../lib/nearTermTreasuryService';
 import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
@@ -11,6 +12,7 @@ export default function TokenInfo() {
   const [domainSupply, setDomainSupply] = useState(0);
   const [lockedTokens, setLockedTokens] = useState(0);
   const [guardiansToVest, setGuardiansToVest] = useState(0);
+  const [nearTermTreasuryBalance, setNearTermWalletBalance] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -38,14 +40,16 @@ export default function TokenInfo() {
           staked,
           consensus,
           domains,
-          guardiansToVestAmount
+          guardiansToVestAmount,
+          nearTermTreasuryBalance
         ] = await Promise.all([
           getTokenDistribution(),
           calculateCirculatingSupply(),
           getTotalStakedAmount(),
           getConsensusTokenSupply(),
           getDomainTokenSupply(),
-          getGuardiansStakingIncentiveToVest()
+          getGuardiansStakingIncentiveToVest(),
+          getNearTermTreasuryWalletBalance()
         ]);
 
         // Get locked tokens (synchronous)
@@ -58,6 +62,7 @@ export default function TokenInfo() {
         setDomainSupply(domains);
         setLockedTokens(locked);
         setGuardiansToVest(guardiansToVestAmount || 0);
+        setNearTermWalletBalance(nearTermTreasuryBalance || 0);
       } catch (error) {
         console.error('Error loading token data:', error);
         
@@ -527,8 +532,15 @@ export default function TokenInfo() {
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Locked Tokens: {formatNumber(lockedTokens)} tokens
             </div>
+
+            <div style={{ marginBottom: '10px' }}>
+              <strong>Step 4:</strong> Subtract other tokens not in circulation
+            </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens
+            </div>
+            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+              • Near-Term Treasury: {formatNumber(nearTermTreasuryBalance)} tokens
             </div>
             
             <div style={{ 
@@ -541,7 +553,7 @@ export default function TokenInfo() {
               <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
                 Final Calculation:
               </div>
-              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)}</div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)}</div>
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
                 = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
               </div>
@@ -718,7 +730,7 @@ export default function TokenInfo() {
               }}>
                 <div style={{ marginLeft: '20px' }}>
                   <p>• <strong>Operations:</strong> {formatNumber(foundation.operations.tokens)} tokens ({foundation.operations.percent.toFixed(2)}%) - <span style={{color: '#10b981'}}>{foundation.operations.vesting === 'unlocked' ? 'Unlocked' : 'Locked'}</span></p>
-                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(foundation.nearTermTreasury.tokens)} tokens ({foundation.nearTermTreasury.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{foundation.nearTermTreasury.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
+                  <p>• <strong>Near-Term Treasury:</strong> {formatNumber(foundation.nearTermTreasury.tokens)} tokens ({foundation.nearTermTreasury.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>Dynamic</span></p>
                   <p>• <strong>Guardians of Growth Staking Incentive:</strong> {formatNumber(foundation.GuardiansOfGrowthStakingIncentive.tokens)} tokens ({foundation.GuardiansOfGrowthStakingIncentive.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>Dynamic</span></p>
                   <p>• <strong>Long-Term Treasury:</strong> {formatNumber(foundation.longTermTreasury.tokens)} tokens ({foundation.longTermTreasury.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{foundation.longTermTreasury.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
                 </div>
