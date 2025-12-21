@@ -4,6 +4,7 @@ import { getNearTermTreasuryWalletBalance } from '../lib/nearTermTreasuryService
 import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
+import { getSubspaceFoundationOperationsWalletBalance } from '../lib/subspaceFoundationOperationsService';
 
 export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
@@ -13,6 +14,7 @@ export default function TokenInfo() {
   const [lockedTokens, setLockedTokens] = useState(0);
   const [guardiansToVest, setGuardiansToVest] = useState(0);
   const [nearTermTreasuryBalance, setNearTermWalletBalance] = useState(0);
+  const [subspaceFoundationOperationsBalance, setSubspaceFoundationOperationsBalance] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -41,7 +43,8 @@ export default function TokenInfo() {
           consensus,
           domains,
           guardiansToVestAmount,
-          nearTermTreasuryBalance
+          nearTermTreasuryBalance,
+          subspaceFoundationOperationsBalance
         ] = await Promise.all([
           getTokenDistribution(),
           calculateCirculatingSupply(),
@@ -49,7 +52,8 @@ export default function TokenInfo() {
           getConsensusTokenSupply(),
           getDomainTokenSupply(),
           getGuardiansStakingIncentiveToVest(),
-          getNearTermTreasuryWalletBalance()
+          getNearTermTreasuryWalletBalance(),
+          getSubspaceFoundationOperationsWalletBalance()
         ]);
 
         // Get locked tokens (synchronous)
@@ -63,6 +67,7 @@ export default function TokenInfo() {
         setLockedTokens(locked);
         setGuardiansToVest(guardiansToVestAmount || 0);
         setNearTermWalletBalance(nearTermTreasuryBalance || 0);
+        setSubspaceFoundationOperationsBalance(subspaceFoundationOperationsBalance || 0);
       } catch (error) {
         console.error('Error loading token data:', error);
         
@@ -539,10 +544,12 @@ export default function TokenInfo() {
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
               • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens
             </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Near-Term Treasury: {formatNumber(nearTermTreasuryBalance)} tokens
-            </div>
-            
+              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+                • Near-Term Treasury: {formatNumber(nearTermTreasuryBalance)} tokens
+              </div>
+              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+                • Subspace Foundation Operations: {formatNumber(subspaceFoundationOperationsBalance)} tokens
+              </div>
             <div style={{ 
               background: '#e0f2fe', 
               padding: '15px', 
@@ -553,7 +560,7 @@ export default function TokenInfo() {
               <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
                 Final Calculation:
               </div>
-              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)}</div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)}</div>
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
                 = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
               </div>
