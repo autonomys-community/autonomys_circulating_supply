@@ -5,7 +5,7 @@ import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
 import { getSubspaceFoundationOperationsWalletBalance } from '../lib/subspaceFoundationOperationsService';
-import { getAmbassadorsWalletBalance, getAutoEvmNativeAi3BalanceAI3, getWrappedAi3BalanceOfAI3, getWrappedAi3TotalSupplyAI3 } from '../lib/ambassadorsService';
+import { getAmbassadorsWalletBalance, getHedgeyAdminAi3Balance, getWrappedAi3TotalSupplyAI3 } from '../lib/ambassadorsService';
 
 export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
@@ -18,7 +18,6 @@ export default function TokenInfo() {
   const [subspaceFoundationOperationsBalance, setSubspaceFoundationOperationsBalance] = useState(0);
   const [ambassadorsWalletBalance, setAmbassadorsWalletBalance] = useState(0);
   const [wrappedAi3TotalSupply, setWrappedAi3TotalSupply] = useState(0);
-  const [hedgeySfAdminWrappedBalance, setHedgeySfAdminWrappedBalance] = useState(0);
   const [hedgeySfAdminNativeAi3Balance, setHedgeySfAdminNativeAi3Balance] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
@@ -52,7 +51,6 @@ export default function TokenInfo() {
           subspaceFoundationOperationsBalance,
           ambassadorsWalletBalance,
           wrappedAi3TotalSupply,
-          hedgeySfAdminWrappedBalance,
           hedgeySfAdminNativeAi3Balance
         ] = await Promise.all([
           getTokenDistribution(),
@@ -65,8 +63,7 @@ export default function TokenInfo() {
           getSubspaceFoundationOperationsWalletBalance(),
           getAmbassadorsWalletBalance(),
           getWrappedAi3TotalSupplyAI3(),
-          getWrappedAi3BalanceOfAI3(),
-          getAutoEvmNativeAi3BalanceAI3()
+          getHedgeyAdminAi3Balance()
         ]);
 
         // Get locked tokens (synchronous)
@@ -83,7 +80,6 @@ export default function TokenInfo() {
         setSubspaceFoundationOperationsBalance(subspaceFoundationOperationsBalance || 0);
         setAmbassadorsWalletBalance(ambassadorsWalletBalance || 0);
         setWrappedAi3TotalSupply(wrappedAi3TotalSupply || 0);
-        setHedgeySfAdminWrappedBalance(hedgeySfAdminWrappedBalance || 0);
         setHedgeySfAdminNativeAi3Balance(hedgeySfAdminNativeAi3Balance || 0);
       } catch (error) {
         console.error('Error loading token data:', error);
@@ -139,7 +135,6 @@ export default function TokenInfo() {
   const ambassadorsNotInCirculatingSupplyRaw =
     (ambassadorsWalletBalance || 0) +
     (wrappedAi3TotalSupply || 0) +
-    (hedgeySfAdminWrappedBalance || 0) +
     (hedgeySfAdminNativeAi3Balance || 0);
   const ambassadorsNotInCirculatingSupply = Math.max(
     0,
@@ -580,7 +575,7 @@ export default function TokenInfo() {
                 • Subspace Foundation Operations: {formatNumber(subspaceFoundationOperationsBalance)} tokens
               </div>
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Ambassadors (dynamic, non-circulating at this moment): {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
+                • Ambassador Program: {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
               </div>
             <div style={{ 
               background: '#e0f2fe', 
