@@ -5,6 +5,7 @@ import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
 import { getSubspaceFoundationOperationsWalletBalance } from '../lib/subspaceFoundationOperationsService';
+import { getAmbassadorsWalletBalance, getHedgeyAdminAi3Balance, getWrappedAi3TotalSupplyAI3 } from '../lib/ambassadorsService';
 
 export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
@@ -15,6 +16,9 @@ export default function TokenInfo() {
   const [guardiansToVest, setGuardiansToVest] = useState(0);
   const [nearTermTreasuryBalance, setNearTermWalletBalance] = useState(0);
   const [subspaceFoundationOperationsBalance, setSubspaceFoundationOperationsBalance] = useState(0);
+  const [ambassadorsWalletBalance, setAmbassadorsWalletBalance] = useState(0);
+  const [wrappedAi3TotalSupply, setWrappedAi3TotalSupply] = useState(0);
+  const [hedgeySfAdminNativeAi3Balance, setHedgeySfAdminNativeAi3Balance] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -44,7 +48,10 @@ export default function TokenInfo() {
           domains,
           guardiansToVestAmount,
           nearTermTreasuryBalance,
-          subspaceFoundationOperationsBalance
+          subspaceFoundationOperationsBalance,
+          ambassadorsWalletBalance,
+          wrappedAi3TotalSupply,
+          hedgeySfAdminNativeAi3Balance
         ] = await Promise.all([
           getTokenDistribution(),
           calculateCirculatingSupply(),
@@ -53,7 +60,10 @@ export default function TokenInfo() {
           getDomainTokenSupply(),
           getGuardiansStakingIncentiveToVest(),
           getNearTermTreasuryWalletBalance(),
-          getSubspaceFoundationOperationsWalletBalance()
+          getSubspaceFoundationOperationsWalletBalance(),
+          getAmbassadorsWalletBalance(),
+          getWrappedAi3TotalSupplyAI3(),
+          getHedgeyAdminAi3Balance()
         ]);
 
         // Get locked tokens (synchronous)
@@ -68,6 +78,9 @@ export default function TokenInfo() {
         setGuardiansToVest(guardiansToVestAmount || 0);
         setNearTermWalletBalance(nearTermTreasuryBalance || 0);
         setSubspaceFoundationOperationsBalance(subspaceFoundationOperationsBalance || 0);
+        setAmbassadorsWalletBalance(ambassadorsWalletBalance || 0);
+        setWrappedAi3TotalSupply(wrappedAi3TotalSupply || 0);
+        setHedgeySfAdminNativeAi3Balance(hedgeySfAdminNativeAi3Balance || 0);
       } catch (error) {
         console.error('Error loading token data:', error);
         
@@ -116,6 +129,17 @@ export default function TokenInfo() {
   const vendors = a.vendors;
   const ambassadors = a.ambassadors;
   const farmerRewards = a.farmerRewards;
+
+  // Ambassadors: show a single "not in circulating supply" number on the frontend
+  // (keep consistent with backend which caps the locked amount to the allocation)
+  const ambassadorsNotInCirculatingSupplyRaw =
+    (ambassadorsWalletBalance || 0) +
+    (wrappedAi3TotalSupply || 0) +
+    (hedgeySfAdminNativeAi3Balance || 0);
+  const ambassadorsNotInCirculatingSupply = Math.max(
+    0,
+    Math.min(ambassadors?.tokens || 0, ambassadorsNotInCirculatingSupplyRaw)
+  );
 
   const teamPercent = (team.foundersAndStaff.percent + team.advisors.percent).toFixed(2);
   const autonomysPercent = (autonomysLabs.devcoTreasury.percent + autonomysLabs.marketLiquidity.percent).toFixed(2);
@@ -550,6 +574,9 @@ export default function TokenInfo() {
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
                 • Subspace Foundation Operations: {formatNumber(subspaceFoundationOperationsBalance)} tokens
               </div>
+              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+                • Ambassador Program: {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
+              </div>
             <div style={{ 
               background: '#e0f2fe', 
               padding: '15px', 
@@ -560,7 +587,7 @@ export default function TokenInfo() {
               <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
                 Final Calculation:
               </div>
-              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)}</div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)} - {formatNumber(ambassadorsNotInCirculatingSupply)}</div>
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
                 = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
               </div>
@@ -822,7 +849,7 @@ export default function TokenInfo() {
               }}>
                 <div style={{ marginLeft: '20px' }}>
                   <p>• <strong>Vendors:</strong> {formatNumber(vendors.tokens)} tokens ({vendors.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{vendors.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
-                  <p>• <strong>Ambassadors:</strong> {formatNumber(ambassadors.tokens)} tokens ({ambassadors.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{ambassadors.vesting === 'locked' ? 'Locked' : 'Unlocked'}</span></p>
+                  <p>• <strong>Ambassadors:</strong> {formatNumber(ambassadors.tokens)} tokens ({ambassadors.percent.toFixed(2)}%) - <span style={{color: '#f59e0b'}}>{ambassadors.vesting === 'dynamic' ? 'Dynamic' : (ambassadors.vesting === 'locked' ? 'Locked' : 'Unlocked')}</span></p>
                 </div>
               </div>
             )}
