@@ -54,7 +54,8 @@ export default function TokenInfo() {
           ambassadorsWalletBalance,
           wrappedAi3TotalSupply,
           hedgeySfAdminNativeAi3Balance,
-          sfAutoEvmBalance
+          sfAutoEvmBalance,
+          locked
         ] = await Promise.all([
           getTokenDistribution(),
           calculateCirculatingSupply(),
@@ -67,11 +68,9 @@ export default function TokenInfo() {
           getAmbassadorsWalletBalance(),
           getWrappedAi3TotalSupplyAI3(),
           getHedgeyAdminAi3Balance(),
-          getSubspaceFoundationAutoEvmTotalBalance()
+          getSubspaceFoundationAutoEvmTotalBalance(),
+          getLockedTokensAmount()
         ]);
-
-        // Get locked tokens (synchronous)
-        const locked = getLockedTokensAmount();
 
         // Set all state values
         setTokenData({ ...data, currentCirculating: circulating });
