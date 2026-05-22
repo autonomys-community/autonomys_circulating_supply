@@ -255,6 +255,33 @@ export default function TokenInfo() {
           >
             BlockScience Research
           </a>
+          <a 
+            href="https://forum.autonomys.xyz/t/subspace-foundation-autonomys-labs-wallets-official-addresses-for-transparency/4917" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#6b7280', 
+              textDecoration: 'none',
+              fontSize: '1rem',
+              border: '1px solid #d1d5db',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#f3f4f6';
+              e.target.style.borderColor = '#9ca3af';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.borderColor = '#d1d5db';
+            }}
+          >
+            Official List of Subspace Foundation & Autonomys Labs Wallets
+          </a>
         </div>
       </header>
 
@@ -938,6 +965,19 @@ export default function TokenInfo() {
             }}
           >
             Code Repository
+          </a>
+          <a 
+            href="https://forum.autonomys.xyz/t/subspace-foundation-autonomys-labs-wallets-official-addresses-for-transparency/4917" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#2563eb', 
+              textDecoration: 'none',
+              marginLeft: '30px',
+              fontSize: '1.1rem'
+            }}
+          >
+            Official Wallet List
           </a>
         </div>
         <p style={{ fontSize: '0.9rem', marginTop: '15px' }}>
