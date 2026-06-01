@@ -6,6 +6,7 @@ import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
 import { getSubspaceFoundationOperationsWalletBalance } from '../lib/subspaceFoundationOperationsService';
 import { getAmbassadorsWalletBalance, getHedgeyAdminAi3Balance, getWrappedAi3TotalSupplyAI3 } from '../lib/ambassadorsService';
+import { getSubspaceFoundationAutoEvmTotalBalance } from '../lib/subspaceFoundationAutoEvmService';
 
 export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
@@ -19,6 +20,7 @@ export default function TokenInfo() {
   const [ambassadorsWalletBalance, setAmbassadorsWalletBalance] = useState(0);
   const [wrappedAi3TotalSupply, setWrappedAi3TotalSupply] = useState(0);
   const [hedgeySfAdminNativeAi3Balance, setHedgeySfAdminNativeAi3Balance] = useState(0);
+  const [sfAutoEvmBalance, setSfAutoEvmBalance] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -51,7 +53,8 @@ export default function TokenInfo() {
           subspaceFoundationOperationsBalance,
           ambassadorsWalletBalance,
           wrappedAi3TotalSupply,
-          hedgeySfAdminNativeAi3Balance
+          hedgeySfAdminNativeAi3Balance,
+          sfAutoEvmBalance
         ] = await Promise.all([
           getTokenDistribution(),
           calculateCirculatingSupply(),
@@ -63,11 +66,12 @@ export default function TokenInfo() {
           getSubspaceFoundationOperationsWalletBalance(),
           getAmbassadorsWalletBalance(),
           getWrappedAi3TotalSupplyAI3(),
-          getHedgeyAdminAi3Balance()
+          getHedgeyAdminAi3Balance(),
+          getSubspaceFoundationAutoEvmTotalBalance(),
         ]);
 
-        // Get locked tokens (synchronous)
-        const locked = getLockedTokensAmount();
+        // Fetch locked tokens separately to avoid RPC connection contention
+        const locked = await getLockedTokensAmount();
 
         // Set all state values
         setTokenData({ ...data, currentCirculating: circulating });
@@ -81,6 +85,7 @@ export default function TokenInfo() {
         setAmbassadorsWalletBalance(ambassadorsWalletBalance || 0);
         setWrappedAi3TotalSupply(wrappedAi3TotalSupply || 0);
         setHedgeySfAdminNativeAi3Balance(hedgeySfAdminNativeAi3Balance || 0);
+        setSfAutoEvmBalance(sfAutoEvmBalance || 0);
       } catch (error) {
         console.error('Error loading token data:', error);
         
@@ -249,6 +254,33 @@ export default function TokenInfo() {
             }}
           >
             BlockScience Research
+          </a>
+          <a 
+            href="https://forum.autonomys.xyz/t/subspace-foundation-autonomys-labs-wallets-official-addresses-for-transparency/4917" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#6b7280', 
+              textDecoration: 'none',
+              fontSize: '1rem',
+              border: '1px solid #d1d5db',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#f3f4f6';
+              e.target.style.borderColor = '#9ca3af';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.borderColor = '#d1d5db';
+            }}
+          >
+            Official List of Subspace Foundation & Autonomys Labs Wallets
           </a>
         </div>
       </header>
@@ -577,6 +609,9 @@ export default function TokenInfo() {
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
                 • Ambassador Program: {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
               </div>
+              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+                • Subspace Foundation Wallets (Auto EVM): {formatNumber(sfAutoEvmBalance)} tokens
+              </div>
             <div style={{ 
               background: '#e0f2fe', 
               padding: '15px', 
@@ -587,7 +622,7 @@ export default function TokenInfo() {
               <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
                 Final Calculation:
               </div>
-              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)} - {formatNumber(ambassadorsNotInCirculatingSupply)}</div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)} - {formatNumber(ambassadorsNotInCirculatingSupply)} - {formatNumber(sfAutoEvmBalance)}</div>
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
                 = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
               </div>
@@ -930,6 +965,19 @@ export default function TokenInfo() {
             }}
           >
             Code Repository
+          </a>
+          <a 
+            href="https://forum.autonomys.xyz/t/subspace-foundation-autonomys-labs-wallets-official-addresses-for-transparency/4917" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#2563eb', 
+              textDecoration: 'none',
+              marginLeft: '30px',
+              fontSize: '1.1rem'
+            }}
+          >
+            Official Wallet List
           </a>
         </div>
         <p style={{ fontSize: '0.9rem', marginTop: '15px' }}>
