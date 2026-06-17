@@ -5,8 +5,8 @@ import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
 import { getSubspaceFoundationOperationsWalletBalance } from '../lib/subspaceFoundationOperationsService';
-import { getAmbassadorsWalletBalance, getHedgeyAdminAi3Balance, getWrappedAi3TotalSupplyAI3 } from '../lib/ambassadorsService';
-import { getSubspaceFoundationAutoEvmTotalBalance } from '../lib/subspaceFoundationAutoEvmService';
+import { getAmbassadorsWalletBalance } from '../lib/ambassadorsService';
+import { getSubspaceFoundationAutoEvmBalances, getWrappedAi3TotalSupply } from '../lib/subspaceFoundationAutoEvmService';
 
 export default function TokenInfo() {
   const [tokenData, setTokenData] = useState(null);
@@ -18,9 +18,9 @@ export default function TokenInfo() {
   const [nearTermTreasuryBalance, setNearTermWalletBalance] = useState(0);
   const [subspaceFoundationOperationsBalance, setSubspaceFoundationOperationsBalance] = useState(0);
   const [ambassadorsWalletBalance, setAmbassadorsWalletBalance] = useState(0);
-  const [wrappedAi3TotalSupply, setWrappedAi3TotalSupply] = useState(0);
-  const [hedgeySfAdminNativeAi3Balance, setHedgeySfAdminNativeAi3Balance] = useState(0);
   const [sfAutoEvmBalance, setSfAutoEvmBalance] = useState(0);
+  const [sfAutoEvmWallets, setSfAutoEvmWallets] = useState([]);
+  const [wrappedAi3TotalSupply, setWrappedAi3TotalSupply] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     investors: false,
     team: false,
@@ -52,9 +52,8 @@ export default function TokenInfo() {
           nearTermTreasuryBalance,
           subspaceFoundationOperationsBalance,
           ambassadorsWalletBalance,
-          wrappedAi3TotalSupply,
-          hedgeySfAdminNativeAi3Balance,
-          sfAutoEvmBalance
+          sfAutoEvm,
+          wrappedAi3TotalSupply
         ] = await Promise.all([
           getTokenDistribution(),
           calculateCirculatingSupply(),
@@ -65,9 +64,8 @@ export default function TokenInfo() {
           getNearTermTreasuryWalletBalance(),
           getSubspaceFoundationOperationsWalletBalance(),
           getAmbassadorsWalletBalance(),
-          getWrappedAi3TotalSupplyAI3(),
-          getHedgeyAdminAi3Balance(),
-          getSubspaceFoundationAutoEvmTotalBalance(),
+          getSubspaceFoundationAutoEvmBalances(),
+          getWrappedAi3TotalSupply(),
         ]);
 
         // Fetch locked tokens separately to avoid RPC connection contention
@@ -83,9 +81,9 @@ export default function TokenInfo() {
         setNearTermWalletBalance(nearTermTreasuryBalance || 0);
         setSubspaceFoundationOperationsBalance(subspaceFoundationOperationsBalance || 0);
         setAmbassadorsWalletBalance(ambassadorsWalletBalance || 0);
+        setSfAutoEvmBalance(sfAutoEvm?.total || 0);
+        setSfAutoEvmWallets(sfAutoEvm?.wallets || []);
         setWrappedAi3TotalSupply(wrappedAi3TotalSupply || 0);
-        setHedgeySfAdminNativeAi3Balance(hedgeySfAdminNativeAi3Balance || 0);
-        setSfAutoEvmBalance(sfAutoEvmBalance || 0);
       } catch (error) {
         console.error('Error loading token data:', error);
         
@@ -136,14 +134,12 @@ export default function TokenInfo() {
   const farmerRewards = a.farmerRewards;
 
   // Ambassadors: show a single "not in circulating supply" number on the frontend
-  // (keep consistent with backend which caps the locked amount to the allocation)
-  const ambassadorsNotInCirculatingSupplyRaw =
-    (ambassadorsWalletBalance || 0) +
-    (wrappedAi3TotalSupply || 0) +
-    (hedgeySfAdminNativeAi3Balance || 0);
+  // (keep consistent with backend, which caps the locked amount to the allocation).
+  // Wrapped AI3 is now tracked per-wallet under the Auto EVM total, so it is no
+  // longer included here.
   const ambassadorsNotInCirculatingSupply = Math.max(
     0,
-    Math.min(ambassadors?.tokens || 0, ambassadorsNotInCirculatingSupplyRaw)
+    Math.min(ambassadors?.tokens || 0, ambassadorsWalletBalance || 0)
   );
 
   const teamPercent = (team.foundersAndStaff.percent + team.advisors.percent).toFixed(2);
@@ -598,19 +594,47 @@ export default function TokenInfo() {
               <strong>Step 4:</strong> Subtract other tokens not in circulation
             </div>
             <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Guardians of Growth Staking Incentive Program: {formatNumber(guardiansToVest)} tokens
+              • Guardians of Growth Staking Incentive Program (Consensus Chain): {formatNumber(guardiansToVest)} tokens
             </div>
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Near-Term Treasury: {formatNumber(nearTermTreasuryBalance)} tokens
+                • Near-Term Treasury (Consensus Chain): {formatNumber(nearTermTreasuryBalance)} tokens
               </div>
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Subspace Foundation Operations: {formatNumber(subspaceFoundationOperationsBalance)} tokens
+                • Subspace Foundation Operations (Consensus Chain): {formatNumber(subspaceFoundationOperationsBalance)} tokens
               </div>
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Ambassador Program: {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
+                • Ambassador Program (Consensus Chain): {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
               </div>
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Subspace Foundation Wallets (Auto EVM): {formatNumber(sfAutoEvmBalance)} tokens
+                • Subspace Foundation Wallets (Auto EVM, Native AI3): {formatNumber(sfAutoEvmBalance)} tokens
+              </div>
+              {sfAutoEvmWallets.length > 0 && (
+                <div style={{ marginLeft: '40px', marginBottom: '10px' }}>
+                  <details>
+                    <summary style={{ cursor: 'pointer', color: '#6b7280' }}>
+                      Per-wallet breakdown (native AI3)
+                    </summary>
+                    <table style={{ width: '100%', marginTop: '8px', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ textAlign: 'right', color: '#6b7280' }}>
+                          <th style={{ textAlign: 'left', padding: '4px 8px' }}>Wallet</th>
+                          <th style={{ padding: '4px 8px' }}>Native</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sfAutoEvmWallets.map((w) => (
+                          <tr key={w.address} style={{ textAlign: 'right', borderTop: '1px solid #e5e7eb' }}>
+                            <td style={{ textAlign: 'left', padding: '4px 8px' }}>{w.name}</td>
+                            <td style={{ padding: '4px 8px' }}>{formatNumber(w.native)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </details>
+                </div>
+              )}
+              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
+                • Wrapped AI3 (wAI3 total supply on Auto EVM): {formatNumber(wrappedAi3TotalSupply)} tokens
               </div>
             <div style={{ 
               background: '#e0f2fe', 
@@ -622,7 +646,7 @@ export default function TokenInfo() {
               <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
                 Final Calculation:
               </div>
-              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)} - {formatNumber(ambassadorsNotInCirculatingSupply)} - {formatNumber(sfAutoEvmBalance)}</div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)} - {formatNumber(ambassadorsNotInCirculatingSupply)} - {formatNumber(sfAutoEvmBalance)} - {formatNumber(wrappedAi3TotalSupply)}</div>
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
                 = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
               </div>
