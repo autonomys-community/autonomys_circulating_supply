@@ -584,27 +584,8 @@ export default function TokenInfo() {
             </div>
             
             <div style={{ marginBottom: '10px' }}>
-              <strong>Step 3:</strong> Subtract locked allocations
+              <strong>Step 3:</strong> Subtract other tokens not in circulation
             </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Locked Tokens: {formatNumber(lockedTokens)} tokens
-            </div>
-
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Step 4:</strong> Subtract other tokens not in circulation
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Guardians of Growth Staking Incentive Program (Consensus Chain): {formatNumber(guardiansToVest)} tokens
-            </div>
-              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Near-Term Treasury (Consensus Chain): {formatNumber(nearTermTreasuryBalance)} tokens
-              </div>
-              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Subspace Foundation Operations (Consensus Chain): {formatNumber(subspaceFoundationOperationsBalance)} tokens
-              </div>
-              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Ambassador Program (Consensus Chain): {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
-              </div>
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
                 • Subspace Foundation Wallets (Auto EVM, Native AI3): {formatNumber(sfAutoEvmBalance)} tokens
               </div>
