@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
-import { calculateCirculatingSupply, getTokenDistribution, getLockedTokensAmount, getGuardiansStakingIncentiveToVest } from '../lib/tokenCalculations';
-import { getNearTermTreasuryWalletBalance } from '../lib/nearTermTreasuryService';
+import { calculateCirculatingSupply, getTokenDistribution } from '../lib/tokenCalculations';
 import { getTotalStakedAmount } from '../lib/stakingService';
 import { getConsensusTokenSupply } from '../lib/consensusSupplyService';
 import { getDomainTokenSupply } from '../lib/domainsSupplyService';
-import { getSubspaceFoundationOperationsWalletBalance } from '../lib/subspaceFoundationOperationsService';
-import { getAmbassadorsWalletBalance } from '../lib/ambassadorsService';
 import { getSubspaceFoundationAutoEvmBalances, getWrappedAi3TotalSupply } from '../lib/subspaceFoundationAutoEvmService';
 
 export default function TokenInfo() {
@@ -13,11 +10,6 @@ export default function TokenInfo() {
   const [totalStaked, setTotalStaked] = useState(0);
   const [consensusSupply, setConsensusSupply] = useState(0);
   const [domainSupply, setDomainSupply] = useState(0);
-  const [lockedTokens, setLockedTokens] = useState(0);
-  const [guardiansToVest, setGuardiansToVest] = useState(0);
-  const [nearTermTreasuryBalance, setNearTermWalletBalance] = useState(0);
-  const [subspaceFoundationOperationsBalance, setSubspaceFoundationOperationsBalance] = useState(0);
-  const [ambassadorsWalletBalance, setAmbassadorsWalletBalance] = useState(0);
   const [sfAutoEvmBalance, setSfAutoEvmBalance] = useState(0);
   const [sfAutoEvmWallets, setSfAutoEvmWallets] = useState([]);
   const [wrappedAi3TotalSupply, setWrappedAi3TotalSupply] = useState(0);
@@ -48,10 +40,6 @@ export default function TokenInfo() {
           staked,
           consensus,
           domains,
-          guardiansToVestAmount,
-          nearTermTreasuryBalance,
-          subspaceFoundationOperationsBalance,
-          ambassadorsWalletBalance,
           sfAutoEvm,
           wrappedAi3TotalSupply
         ] = await Promise.all([
@@ -60,27 +48,15 @@ export default function TokenInfo() {
           getTotalStakedAmount(),
           getConsensusTokenSupply(),
           getDomainTokenSupply(),
-          getGuardiansStakingIncentiveToVest(),
-          getNearTermTreasuryWalletBalance(),
-          getSubspaceFoundationOperationsWalletBalance(),
-          getAmbassadorsWalletBalance(),
           getSubspaceFoundationAutoEvmBalances(),
           getWrappedAi3TotalSupply(),
         ]);
-
-        // Fetch locked tokens separately to avoid RPC connection contention
-        const locked = await getLockedTokensAmount();
 
         // Set all state values
         setTokenData({ ...data, currentCirculating: circulating });
         setTotalStaked(staked);
         setConsensusSupply(consensus);
         setDomainSupply(domains);
-        setLockedTokens(locked);
-        setGuardiansToVest(guardiansToVestAmount || 0);
-        setNearTermWalletBalance(nearTermTreasuryBalance || 0);
-        setSubspaceFoundationOperationsBalance(subspaceFoundationOperationsBalance || 0);
-        setAmbassadorsWalletBalance(ambassadorsWalletBalance || 0);
         setSfAutoEvmBalance(sfAutoEvm?.total || 0);
         setSfAutoEvmWallets(sfAutoEvm?.wallets || []);
         setWrappedAi3TotalSupply(wrappedAi3TotalSupply || 0);
@@ -99,7 +75,6 @@ export default function TokenInfo() {
         setTotalStaked(0);
         setConsensusSupply(0);
         setDomainSupply(0);
-        setLockedTokens(0);
       }
     };
     
@@ -132,15 +107,6 @@ export default function TokenInfo() {
   const vendors = a.vendors;
   const ambassadors = a.ambassadors;
   const farmerRewards = a.farmerRewards;
-
-  // Ambassadors: show a single "not in circulating supply" number on the frontend
-  // (keep consistent with backend, which caps the locked amount to the allocation).
-  // Wrapped AI3 is now tracked per-wallet under the Auto EVM total, so it is no
-  // longer included here.
-  const ambassadorsNotInCirculatingSupply = Math.max(
-    0,
-    Math.min(ambassadors?.tokens || 0, ambassadorsWalletBalance || 0)
-  );
 
   const teamPercent = (team.foundersAndStaff.percent + team.advisors.percent).toFixed(2);
   const autonomysPercent = (autonomysLabs.devcoTreasury.percent + autonomysLabs.marketLiquidity.percent).toFixed(2);
@@ -364,22 +330,6 @@ export default function TokenInfo() {
             {formatPercent(tokenData.currentCirculating)}% of total
           </p>
         </div>
-        
-        <div style={{
-          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-          color: 'white',
-          padding: '30px',
-          borderRadius: '12px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.1rem' }}>Locked Tokens</h3>
-          <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            {formatNumber(lockedTokens + totalStaked)}
-          </p>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.9 }}>
-            Vesting + Staked
-          </p>
-        </div>
       </div>
 
       {/* API Endpoints */}
@@ -584,27 +534,8 @@ export default function TokenInfo() {
             </div>
             
             <div style={{ marginBottom: '10px' }}>
-              <strong>Step 3:</strong> Subtract locked allocations
+              <strong>Step 3:</strong> Subtract other tokens not in circulation
             </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Locked Tokens: {formatNumber(lockedTokens)} tokens
-            </div>
-
-            <div style={{ marginBottom: '10px' }}>
-              <strong>Step 4:</strong> Subtract other tokens not in circulation
-            </div>
-            <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-              • Guardians of Growth Staking Incentive Program (Consensus Chain): {formatNumber(guardiansToVest)} tokens
-            </div>
-              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Near-Term Treasury (Consensus Chain): {formatNumber(nearTermTreasuryBalance)} tokens
-              </div>
-              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Subspace Foundation Operations (Consensus Chain): {formatNumber(subspaceFoundationOperationsBalance)} tokens
-              </div>
-              <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
-                • Ambassador Program (Consensus Chain): {formatNumber(ambassadorsNotInCirculatingSupply)} tokens
-              </div>
               <div style={{ marginLeft: '20px', marginBottom: '10px' }}>
                 • Subspace Foundation Wallets (Auto EVM, Native AI3): {formatNumber(sfAutoEvmBalance)} tokens
               </div>
@@ -646,7 +577,7 @@ export default function TokenInfo() {
               <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
                 Final Calculation:
               </div>
-              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(lockedTokens)} - {formatNumber(guardiansToVest)} - {formatNumber(nearTermTreasuryBalance)} - {formatNumber(subspaceFoundationOperationsBalance)} - {formatNumber(ambassadorsNotInCirculatingSupply)} - {formatNumber(sfAutoEvmBalance)} - {formatNumber(wrappedAi3TotalSupply)}</div>
+              <div>Circulating Supply = {formatNumber(totalOnChainSupply)} - {formatNumber(totalStaked)} - {formatNumber(sfAutoEvmBalance)} - {formatNumber(wrappedAi3TotalSupply)}</div>
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #0ea5e9' }}>
                 = {formatNumber(tokenData.currentCirculating)} tokens ({formatPercent(tokenData.currentCirculating)}% of total supply)
               </div>
@@ -697,7 +628,7 @@ export default function TokenInfo() {
               }}>
                 <p><strong>{formatNumber(investors.tokens)} tokens</strong></p>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                  Locked allocation. Tokens are held in reserve and not yet distributed.
+                  Locked in 4 year vesting contracts with a 1-year cliff from the Mainnet Phase-2 date, followed by a 3-year linear vesting schedule.
                 </p>
               </div>
             )}
@@ -741,7 +672,7 @@ export default function TokenInfo() {
                   <p>• <strong>Advisors:</strong> {formatNumber(team.advisors.tokens)} tokens ({team.advisors.percent.toFixed(2)}%)</p>
                 </div>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                  Locked allocations. Tokens are held in reserve and not yet distributed.
+                  Locked in 4 year vesting contracts with a 1-year cliff from the Mainnet Phase-2 date, followed by a 3-year linear vesting schedule.
                 </p>
               </div>
             )}
