@@ -628,7 +628,7 @@ export default function TokenInfo() {
               }}>
                 <p><strong>{formatNumber(investors.tokens)} tokens</strong></p>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                  Locked allocation. Tokens are held in reserve and not yet distributed.
+                  Locked in 4 year vesting contracts with a 1-year cliff from the Mainnet Phase-2 date, followed by a 3-year linear vesting schedule.
                 </p>
               </div>
             )}
@@ -672,7 +672,7 @@ export default function TokenInfo() {
                   <p>• <strong>Advisors:</strong> {formatNumber(team.advisors.tokens)} tokens ({team.advisors.percent.toFixed(2)}%)</p>
                 </div>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                  Locked allocations. Tokens are held in reserve and not yet distributed.
+                  Locked in 4 year vesting contracts with a 1-year cliff from the Mainnet Phase-2 date, followed by a 3-year linear vesting schedule.
                 </p>
               </div>
             )}
